@@ -13,5 +13,6 @@ variable "iam_admin_users" {
     last_name    = string
     display_name = string
   }))
-  default = []
+  default   = []
+  sensitive = true
 }
