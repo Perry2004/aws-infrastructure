@@ -6,7 +6,7 @@ terraform {
 
     workspaces {
       project = "aws"
-      name    = "aws-infrastructure"
+      name    = "aws-infrastructure-common"
     }
   }
 
