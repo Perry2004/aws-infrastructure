@@ -1,19 +1,19 @@
-terraform {
-  required_version = ">= 1.9.0"
+# terraform {
+#   required_version = ">= 1.9.0"
 
-  cloud {
-    organization = "perry-zhu-aws"
+#   cloud {
+#     organization = "perry-zhu-aws"
 
-    workspaces {
-      project = "aws"
-      name    = "aws-infrastructure-common-iam"
-    }
-  }
+#     workspaces {
+#       project = "aws"
+#       name    = "aws-infrastructure-common-iam"
+#     }
+#   }
 
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 6.0"
-    }
-  }
-}
+#   required_providers {
+#     aws = {
+#       source  = "hashicorp/aws"
+#       version = "~> 6.0"
+#     }
+#   }
+# }
