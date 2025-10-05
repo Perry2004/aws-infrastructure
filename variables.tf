@@ -3,3 +3,15 @@ variable "aws_region" {
   type        = string
   default     = "us-west-2"
 }
+
+variable "iam_admin_users" {
+  description = "List of IAM Identity Center admin users to create"
+  type = list(object({
+    username     = string
+    email        = string
+    first_name   = string
+    last_name    = string
+    display_name = string
+  }))
+  default = []
+}
