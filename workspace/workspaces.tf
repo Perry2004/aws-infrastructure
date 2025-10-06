@@ -19,7 +19,7 @@ resource "tfe_workspace" "common_iam" {
   project_id                    = data.tfe_project.this.id
   vcs_repo {
     identifier     = "Perry2004/aws-infrastructure"
-    oauth_token_id = data.tfe_oauth_client.github.id
+    oauth_token_id = data.tfe_oauth_client.github.oauth_token_id
     branch         = "" # default branch
   }
 }
