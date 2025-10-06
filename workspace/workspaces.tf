@@ -16,6 +16,8 @@ resource "tfe_workspace" "common_iam" {
   working_directory             = "common/iam"
   structured_run_output_enabled = true
   speculative_enabled           = true
+  global_remote_state           = true
+  file_triggers_enabled         = false
   project_id                    = data.tfe_project.this.id
   vcs_repo {
     identifier     = "Perry2004/aws-infrastructure"
