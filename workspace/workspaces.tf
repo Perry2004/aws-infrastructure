@@ -11,7 +11,7 @@ data "tfe_oauth_client" "github" {
 resource "tfe_workspace" "workspaces" {
   for_each = { for ws in var.workspaces : ws.name => ws }
 
-  name                          = "aws-infrastructure-${each.value.name}"
+  name                          = each.value.name
   description                   = each.value.description
   working_directory             = each.value.working_directory
   auto_apply                    = true
