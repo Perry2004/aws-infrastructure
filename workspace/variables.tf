@@ -1,11 +1,20 @@
-variable "github_oauth_token" {
-  type        = string
-  sensitive   = true
-  description = "GitHub OAuth token ID for Terraform Cloud VCS connection"
-}
-
 variable "tfe_token" {
   type        = string
   sensitive   = true
   description = "Terraform Cloud API token"
+}
+
+variable "organization_name" {
+  type        = string
+  description = "Terraform Cloud organization name"
+}
+
+variable "workspaces" {
+  description = "List of workspaces to create in Terraform Cloud"
+  type = list(object({
+    name              = string
+    description       = string
+    working_directory = string
+  }))
+  default = []
 }
