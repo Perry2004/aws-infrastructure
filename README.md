@@ -16,3 +16,5 @@
 - `common` 🔐
 
   The `common` directory contains general resources and configurations that are shared across the account, such as IAM roles, policies, and networking components.
+  - IAM 
+  - DNS
