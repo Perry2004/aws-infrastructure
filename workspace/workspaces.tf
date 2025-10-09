@@ -18,8 +18,8 @@ resource "tfe_workspace" "workspaces" {
   terraform_version             = "~>1.13.0"
   speculative_enabled           = true
   structured_run_output_enabled = true
-  file_triggers_enabled         = false
   project_id                    = data.tfe_project.this.id
+  trigger_prefixes              = each.value.additional_watch_dirs
 
   vcs_repo {
     identifier     = "Perry2004/aws-infrastructure"

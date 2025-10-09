@@ -12,9 +12,10 @@ variable "organization_name" {
 variable "workspaces" {
   description = "List of workspaces to create in Terraform Cloud"
   type = list(object({
-    name              = string
-    description       = string
-    working_directory = string
+    name                  = string
+    description           = string
+    working_directory     = string
+    additional_watch_dirs = optional(list(string), [])
   }))
   default = []
 }
