@@ -9,5 +9,10 @@ workspaces = [
     name              = "common-dns"
     description       = "Workspace for DNS and domain resources in the account"
     working_directory = "common/dns"
+  },
+  {
+    name              = "common-vpc"
+    description       = "Workspace for VPC resources in the account"
+    working_directory = "common/vpc"
   }
 ]
