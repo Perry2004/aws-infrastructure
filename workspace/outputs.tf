@@ -1,5 +1,5 @@
 output "workspace_info" {
-  value       = { for k, v in tfe_workspace.workspaces : k => { id = v.id, name = v.name, description = v.description, working_directory = v.working_directory, additional_watch_dirs = v.trigger_prefixes } }
+  value       = { for k, v in tfe_workspace.workspaces : k => { id = v.id, name = v.name, description = v.description, working_directory = v.working_directory, trigger_patterns = v.trigger_patterns } }
   description = "Map of workspace names to their Terraform Cloud workspace information"
 }
 
