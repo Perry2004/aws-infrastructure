@@ -8,14 +8,3 @@ variable "organization_name" {
   type        = string
   description = "Terraform Cloud organization name"
 }
-
-variable "workspaces" {
-  description = "List of workspaces to create in Terraform Cloud"
-  type = list(object({
-    name              = string
-    description       = string
-    working_directory = string
-    trigger_patterns  = optional(list(string), [])
-  }))
-  default = []
-}
