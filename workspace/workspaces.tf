@@ -19,7 +19,7 @@ resource "tfe_workspace" "workspaces" {
   speculative_enabled           = true
   structured_run_output_enabled = true
   project_id                    = data.tfe_project.this.id
-  trigger_prefixes              = each.value.additional_watch_dirs
+  trigger_prefixes              = length(each.value.additional_watch_dirs) > 0 ? each.value.additional_watch_dirs : null
 
   vcs_repo {
     identifier     = "Perry2004/aws-infrastructure"
