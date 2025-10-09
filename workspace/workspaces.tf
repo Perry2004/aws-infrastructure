@@ -8,8 +8,12 @@ data "tfe_oauth_client" "github" {
   organization     = var.organization_name
 }
 
+locals {
+  workspaces = yamldecode(file("${path.module}/datasource/workspaces.yml"))
+}
+
 resource "tfe_workspace" "workspaces" {
-  for_each = { for ws in var.workspaces : ws.name => ws }
+  for_each = { for ws in local.workspaces.workspaces : ws.name => ws }
 
   name                          = each.value.name
   description                   = each.value.description
@@ -19,13 +23,13 @@ resource "tfe_workspace" "workspaces" {
   speculative_enabled           = true
   structured_run_output_enabled = true
   project_id                    = data.tfe_project.this.id
-  trigger_patterns              = each.value.trigger_patterns
+  trigger_patterns              = try(each.value.trigger_patterns, [])
 
 
   vcs_repo {
     identifier     = "Perry2004/aws-infrastructure"
     oauth_token_id = data.tfe_oauth_client.github.oauth_token_id
-    branch         = ""
+    branch         = "" # default branch
   }
 }
 
