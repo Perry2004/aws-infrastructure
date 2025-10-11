@@ -9,6 +9,7 @@ resource "aws_s3_bucket_ownership_controls" "portfolio_website_bucket" {
   }
 }
 
+# block all public access
 resource "aws_s3_bucket_public_access_block" "portfolio_website_bucket" {
   bucket = aws_s3_bucket.portfolio_website_bucket.id
 
