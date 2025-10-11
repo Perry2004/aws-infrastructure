@@ -8,3 +8,6 @@ workspaces:
   - name: "common-vpc"
     description: "Workspace for VPC resources in the account"
     working_directory: "common/vpc"
+  - name: "portfolio-website"
+    description: "Workspace for the portfolio website infrastructure"
+    working_directory: "apps/prd/portfolio-website"
