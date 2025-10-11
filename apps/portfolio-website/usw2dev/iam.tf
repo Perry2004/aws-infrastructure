@@ -12,7 +12,7 @@ resource "aws_iam_role" "pwp_gha_s3" {
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
-          StringEquals = {
+          StringLike = {
             "token.actions.githubusercontent.com:sub" = "repo:Perry2004/perry2004.github.io:*"
           }
         }
