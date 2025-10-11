@@ -12,4 +12,4 @@ workspaces:
     description: "Workspace for the deployment of the portfolio website in usw2dev"
     working_directory: "apps/portfolio-website/usw2dev"
     trigger_patterns:
-      - "apps/portfolio-website/_modules"
+      - "apps/portfolio-website/_modules/**"

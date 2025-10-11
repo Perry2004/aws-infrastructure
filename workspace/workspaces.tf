@@ -23,7 +23,7 @@ resource "tfe_workspace" "workspaces" {
   speculative_enabled           = true
   structured_run_output_enabled = true
   project_id                    = data.tfe_project.this.id
-  trigger_patterns              = concat(try([each.value.working_directory], []), try(each.value.trigger_patterns, []))
+  trigger_patterns              = concat(try(["${each.value.working_directory}/**"], []), try(each.value.trigger_patterns, []))
   queue_all_runs                = false
 
   vcs_repo {
