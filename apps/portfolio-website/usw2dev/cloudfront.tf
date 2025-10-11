@@ -1,3 +1,33 @@
+# SSL certificate
+resource "aws_acm_certificate" "portfolio_website_cert" {
+  provider          = aws.us-east-1
+  domain_name       = data.terraform_remote_state.dns.outputs.domain_name
+  validation_method = "DNS"
+}
+
+# DNS validation records for ACM certificate
+resource "aws_route53_record" "portfolio_website_cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.portfolio_website_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
+  name    = each.value.name
+  type    = each.value.type
+  records = [each.value.record]
+  ttl     = 60
+}
+
+resource "aws_acm_certificate_validation" "portfolio_website_cert_validation" {
+  provider                = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.portfolio_website_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.portfolio_website_cert_validation : record.fqdn]
+}
+
 # Origin Access Control to allow CloudFront to access private S3 bucket
 resource "aws_cloudfront_origin_access_control" "portfolio_website_oac" {
   name                              = "PortfolioWebsiteOAC"
@@ -16,6 +46,7 @@ resource "aws_cloudfront_distribution" "portfolio_website" {
   is_ipv6_enabled     = true
   comment             = "Portfolio website distribution"
   default_root_object = "index.html"
+  aliases             = [data.terraform_remote_state.dns.outputs.domain_name]
 
   origin {
     domain_name              = aws_s3_bucket.portfolio_website_bucket.bucket_regional_domain_name
@@ -39,7 +70,14 @@ resource "aws_cloudfront_distribution" "portfolio_website" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true # to be changed, test with CloudFront default first
+    acm_certificate_arn      = aws_acm_certificate.portfolio_website_cert.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
-}
 
+  tags = {
+    Name = "PortfolioWebsite-CloudFront"
+  }
+
+  depends_on = [aws_acm_certificate_validation.portfolio_website_cert_validation]
+}
