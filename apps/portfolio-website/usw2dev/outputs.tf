@@ -27,3 +27,13 @@ output "cloudfront_domain_name" {
   description = "Domain name of the CloudFront distribution to access the website"
   value       = aws_cloudfront_distribution.portfolio_website.domain_name
 }
+
+output "acm_certificate_arn" {
+  description = "ARN of the ACM certificate for the custom domain"
+  value       = aws_acm_certificate.portfolio_website_cert.arn
+}
+
+output "acm_certificate_domain_name" {
+  description = "Domain name covered by the ACM certificate"
+  value       = aws_acm_certificate.portfolio_website_cert.domain_name
+}
