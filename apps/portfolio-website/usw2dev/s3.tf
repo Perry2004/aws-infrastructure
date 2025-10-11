@@ -44,10 +44,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "portfolio_website_bucket" {
     id     = "versioning_rule"
     status = "Enabled"
 
-    filter {
-      prefix = ""
-    }
-
     noncurrent_version_expiration {
       noncurrent_days           = var.data_retention_days
       newer_noncurrent_versions = var.num_versions_to_keep
