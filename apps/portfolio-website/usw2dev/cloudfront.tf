@@ -4,6 +4,10 @@ resource "aws_acm_certificate" "portfolio_website_cert" {
   domain_name               = data.terraform_remote_state.dns.outputs.domain_name
   subject_alternative_names = ["www.${data.terraform_remote_state.dns.outputs.domain_name}"]
   validation_method         = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # DNS validation records for ACM certificate
@@ -133,4 +137,8 @@ resource "aws_cloudfront_distribution" "portfolio_website" {
   }
 
   depends_on = [aws_acm_certificate_validation.portfolio_website_cert_validation]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
