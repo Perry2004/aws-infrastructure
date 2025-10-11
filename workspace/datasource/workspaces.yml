@@ -8,6 +8,8 @@ workspaces:
   - name: "common-vpc"
     description: "Workspace for VPC resources in the account"
     working_directory: "common/vpc"
-  - name: "portfolio-website"
-    description: "Workspace for the portfolio website infrastructure"
-    working_directory: "apps/prd/portfolio-website"
+  - name: "portfolio-website-usw2dev"
+    description: "Workspace for the deployment of the portfolio website in usw2dev"
+    working_directory: "apps/portfolio-website/usw2dev"
+    trigger_patterns:
+      - "apps/portfolio-website/_modules"
