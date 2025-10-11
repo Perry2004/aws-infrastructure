@@ -24,7 +24,7 @@ resource "tfe_workspace" "workspaces" {
   structured_run_output_enabled = true
   project_id                    = data.tfe_project.this.id
   trigger_patterns              = try(each.value.trigger_patterns, [])
-
+  queue_all_runs                = false
 
   vcs_repo {
     identifier     = "Perry2004/aws-infrastructure"
