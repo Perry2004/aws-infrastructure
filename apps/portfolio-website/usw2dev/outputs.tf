@@ -37,3 +37,8 @@ output "acm_certificate_domain_name" {
   description = "Domain name covered by the ACM certificate"
   value       = aws_acm_certificate.portfolio_website_cert.domain_name
 }
+
+output "acm_certificate_subject_alternative_names" {
+  description = "Subject alternative names covered by the ACM certificate"
+  value       = aws_acm_certificate.portfolio_website_cert.subject_alternative_names
+}

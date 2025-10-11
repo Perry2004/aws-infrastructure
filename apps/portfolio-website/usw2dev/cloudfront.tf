@@ -1,8 +1,9 @@
 # SSL certificate
 resource "aws_acm_certificate" "portfolio_website_cert" {
-  provider          = aws.us-east-1
-  domain_name       = data.terraform_remote_state.dns.outputs.domain_name
-  validation_method = "DNS"
+  provider                  = aws.us-east-1
+  domain_name               = data.terraform_remote_state.dns.outputs.domain_name
+  subject_alternative_names = ["www.${data.terraform_remote_state.dns.outputs.domain_name}"]
+  validation_method         = "DNS"
 }
 
 # DNS validation records for ACM certificate
@@ -41,6 +42,45 @@ resource "aws_route53_record" "portfolio_website_alias" {
   }
 }
 
+# IPv6 AAAA record
+resource "aws_route53_record" "portfolio_website_alias_ipv6" {
+  zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
+  name    = data.terraform_remote_state.dns.outputs.domain_name
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.portfolio_website.domain_name
+    zone_id                = aws_cloudfront_distribution.portfolio_website.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+# DNS alias record to route www subdomain to CloudFront distribution
+resource "aws_route53_record" "portfolio_website_www_alias" {
+  zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
+  name    = "www.${data.terraform_remote_state.dns.outputs.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.portfolio_website.domain_name
+    zone_id                = aws_cloudfront_distribution.portfolio_website.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+# IPv6 AAAA record for www subdomain
+resource "aws_route53_record" "portfolio_website_www_alias_ipv6" {
+  zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
+  name    = "www.${data.terraform_remote_state.dns.outputs.domain_name}"
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.portfolio_website.domain_name
+    zone_id                = aws_cloudfront_distribution.portfolio_website.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
 # Origin Access Control to allow CloudFront to access private S3 bucket
 resource "aws_cloudfront_origin_access_control" "portfolio_website_oac" {
   name                              = "PortfolioWebsiteOAC"
@@ -59,7 +99,7 @@ resource "aws_cloudfront_distribution" "portfolio_website" {
   is_ipv6_enabled     = true
   comment             = "Portfolio website distribution"
   default_root_object = "index.html"
-  aliases             = [data.terraform_remote_state.dns.outputs.domain_name]
+  aliases             = [data.terraform_remote_state.dns.outputs.domain_name, "www.${data.terraform_remote_state.dns.outputs.domain_name}"]
 
   origin {
     domain_name              = aws_s3_bucket.portfolio_website_bucket.bucket_regional_domain_name
