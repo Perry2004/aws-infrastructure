@@ -9,3 +9,8 @@ output "iam_admin_users" {
   }
   sensitive = true
 }
+
+output "github_oidc_provider_arn" {
+  description = "The ARN of the GitHub OIDC provider"
+  value       = aws_iam_openid_connect_provider.github.arn
+}
