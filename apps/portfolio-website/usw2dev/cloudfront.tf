@@ -28,6 +28,19 @@ resource "aws_acm_certificate_validation" "portfolio_website_cert_validation" {
   validation_record_fqdns = [for record in aws_route53_record.portfolio_website_cert_validation : record.fqdn]
 }
 
+# DNS alias record to route domain to CloudFront distribution
+resource "aws_route53_record" "portfolio_website_alias" {
+  zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
+  name    = data.terraform_remote_state.dns.outputs.domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.portfolio_website.domain_name
+    zone_id                = aws_cloudfront_distribution.portfolio_website.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
 # Origin Access Control to allow CloudFront to access private S3 bucket
 resource "aws_cloudfront_origin_access_control" "portfolio_website_oac" {
   name                              = "PortfolioWebsiteOAC"
