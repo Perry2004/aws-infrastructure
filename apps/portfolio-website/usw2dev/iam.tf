@@ -54,7 +54,8 @@ resource "aws_iam_policy" "pwp_gha" {
         Sid    = "AllowCloudFrontInvalidation"
         Effect = "Allow"
         Action = [
-          "cloudfront:CreateInvalidation"
+          "cloudfront:CreateInvalidation",
+          "cloudfront:GetInvalidation"
         ]
         Resource = [
           aws_cloudfront_distribution.portfolio_website.arn
