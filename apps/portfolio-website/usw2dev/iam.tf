@@ -59,6 +59,16 @@ resource "aws_iam_policy" "pwp_gha" {
         Resource = [
           aws_cloudfront_distribution.portfolio_website.arn
         ]
+      },
+      {
+        Sid    = "AllowTagGetting"
+        Effect = "Allow"
+        Action = [
+          "tag:GetResources"
+        ]
+        Resource = [
+          "*"
+        ]
       }
     ]
   })
