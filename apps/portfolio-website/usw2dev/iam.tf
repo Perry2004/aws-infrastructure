@@ -62,6 +62,10 @@ resource "aws_iam_policy" "pwp_gha" {
       }
     ]
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "github_actions_s3" {
