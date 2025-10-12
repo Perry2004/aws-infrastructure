@@ -21,7 +21,7 @@ resource "aws_iam_role" "pwp_gha_s3" {
   })
 }
 
-resource "aws_iam_policy" "pwp_gha_s3_read_write" {
+resource "aws_iam_policy" "pwp_gha" {
   name        = "ReadWrite-PortfolioWebsite-S3"
   description = "Allow the portfolio website GitHub Actions to update the latest build artifacts in S3"
 
@@ -29,6 +29,7 @@ resource "aws_iam_policy" "pwp_gha_s3_read_write" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "AllowS3List"
         Effect = "Allow"
         Action = [
           "s3:ListBucket"
@@ -38,6 +39,7 @@ resource "aws_iam_policy" "pwp_gha_s3_read_write" {
         ]
       },
       {
+        Sid    = "AllowS3ReadWrite"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
@@ -47,6 +49,16 @@ resource "aws_iam_policy" "pwp_gha_s3_read_write" {
         Resource = [
           "${aws_s3_bucket.portfolio_website_bucket.arn}/*"
         ]
+      },
+      {
+        Sid    = "AllowCloudFrontInvalidation"
+        Effect = "Allow"
+        Action = [
+          "cloudfront:CreateInvalidation"
+        ]
+        Resource = [
+          aws_cloudfront_distribution.portfolio_website.arn
+        ]
       }
     ]
   })
@@ -54,5 +66,5 @@ resource "aws_iam_policy" "pwp_gha_s3_read_write" {
 
 resource "aws_iam_role_policy_attachment" "github_actions_s3" {
   role       = aws_iam_role.pwp_gha_s3.name
-  policy_arn = aws_iam_policy.pwp_gha_s3_read_write.arn
+  policy_arn = aws_iam_policy.pwp_gha.arn
 }
