@@ -133,7 +133,7 @@ resource "aws_cloudfront_distribution" "portfolio_website" {
   }
 
   tags = {
-    Name = "PortfolioWebsite-CloudFront"
+    Name = "PortfolioWebsite-CloudFront-${var.env_name}"
   }
 
   depends_on = [aws_acm_certificate_validation.portfolio_website_cert_validation]
