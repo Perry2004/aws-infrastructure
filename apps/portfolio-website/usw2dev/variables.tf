@@ -20,3 +20,9 @@ variable "num_versions_to_keep" {
   type        = number
   default     = 3
 }
+
+variable "s3_website_prefix" {
+  description = "The prefix (folder) in the S3 bucket to serve the website from"
+  type        = string
+  default     = "website"
+}

@@ -65,7 +65,7 @@ resource "aws_s3_bucket_policy" "portfolio_website_oac_policy" {
           Service = "cloudfront.amazonaws.com"
         }
         Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.portfolio_website_bucket.arn}/*"
+        Resource = "${aws_s3_bucket.portfolio_website_bucket.arn}/${var.s3_website_prefix}/*"
         Condition = {
           StringEquals = {
             "AWS:SourceArn" = aws_cloudfront_distribution.portfolio_website.arn

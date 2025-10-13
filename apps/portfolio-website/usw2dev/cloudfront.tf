@@ -109,6 +109,7 @@ resource "aws_cloudfront_distribution" "portfolio_website" {
     domain_name              = aws_s3_bucket.portfolio_website_bucket.bucket_regional_domain_name
     origin_id                = "S3-${aws_s3_bucket.portfolio_website_bucket.bucket}"
     origin_access_control_id = aws_cloudfront_origin_access_control.portfolio_website_oac.id
+    origin_path              = "/${var.s3_website_prefix}"
   }
 
   default_cache_behavior {
