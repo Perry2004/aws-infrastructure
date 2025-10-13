@@ -5,7 +5,7 @@ resource "aws_lambda_function" "lambda_from_s3" {
   s3_bucket = aws_s3_bucket.portfolio_website_bucket.bucket
   s3_key    = "${var.s3_lambda_prefix}/lambda-function.zip"
 
-  handler          = "lambda-handler.lambda_handler"
+  handler          = "lambda-handler.lambdaHandler"
   runtime          = "nodejs22.x"
   architectures    = ["x86_64"]
   source_code_hash = data.aws_s3_object.lambda_zip.etag
