@@ -26,3 +26,9 @@ variable "s3_website_prefix" {
   type        = string
   default     = "website"
 }
+
+variable "s3_lambda_prefix" {
+  description = "The prefix (folder) in the S3 bucket to store lambda deployment packages"
+  type        = string
+  default     = "lambda"
+}
