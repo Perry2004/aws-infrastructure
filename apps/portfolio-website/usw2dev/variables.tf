@@ -32,3 +32,9 @@ variable "s3_lambda_prefix" {
   type        = string
   default     = "lambda"
 }
+
+variable "chromium_layer_zip_name" {
+  description = "The name of the chromium layer zip file"
+  type        = string
+  default     = "chromium-v141.0.0-layer.x64.zip"
+}
