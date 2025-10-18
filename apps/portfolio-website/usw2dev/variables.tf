@@ -26,15 +26,3 @@ variable "s3_website_prefix" {
   type        = string
   default     = "website"
 }
-
-variable "s3_lambda_prefix" {
-  description = "The prefix (folder) in the S3 bucket to store lambda deployment packages"
-  type        = string
-  default     = "lambda"
-}
-
-variable "chromium_layer_zip_name" {
-  description = "The name of the chromium layer zip file"
-  type        = string
-  default     = "chromium-v141.0.0-layer.x64.zip"
-}
