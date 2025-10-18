@@ -31,3 +31,9 @@
 #   bucket = aws_s3_bucket.portfolio_website_bucket.bucket
 #   key    = "${var.s3_lambda_prefix}/${var.chromium_layer_zip_name}"
 # }
+
+# ecr repo for lambda container image
+resource "aws_ecr_repository" "lambda_container_repo" {
+  name                 = "pwp/pexels-image-scraper-lambda"
+  image_tag_mutability = "MUTABLE"
+}
