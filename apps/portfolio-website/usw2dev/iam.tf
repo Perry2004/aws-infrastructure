@@ -72,24 +72,24 @@ resource "aws_iam_policy" "pwp_gha" {
         ]
       },
       {
-        Sid    = "AllowECRGetToken"
+        Sid    = "AllowECRPublicGetToken"
         Effect = "Allow"
         Action = [
-          "ecr:GetAuthorizationToken"
+          "ecr-public:GetAuthorizationToken"
         ],
         Resource = ["*"]
       },
       {
-        Sid    = "AllowECRPush"
+        Sid    = "AllowECRPublicPush"
         Effect = "Allow"
         Action = [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:CompleteLayerUpload",
-          "ecr:InitiateLayerUpload",
-          "ecr:PutImage",
-          "ecr:UploadLayerPart"
+          "ecr-public:BatchCheckLayerAvailability",
+          "ecr-public:CompleteLayerUpload",
+          "ecr-public:InitiateLayerUpload",
+          "ecr-public:PutImage",
+          "ecr-public:UploadLayerPart"
         ]
-        Resource = [aws_ecr_repository.lambda_container_repo.arn]
+        Resource = [aws_ecrpublic_repository.lambda_container_repo.arn]
       }
     ]
   })
