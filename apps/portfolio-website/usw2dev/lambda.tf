@@ -32,8 +32,13 @@
 #   key    = "${var.s3_lambda_prefix}/${var.chromium_layer_zip_name}"
 # }
 
-# ecr repo for lambda container image
-resource "aws_ecr_repository" "lambda_container_repo" {
-  name                 = "pwp/pexels-image-scraper-lambda"
-  image_tag_mutability = "MUTABLE"
+# Public ECR repository for lambda container image
+resource "aws_ecrpublic_repository" "lambda_container_repo" {
+  repository_name = "pexels-image-scraper-lambda"
+
+  catalog_data {
+    description = "Public repository for Pexels image scraper lambda container"
+    about_text  = "Container image for AWS Lambda function that scrapes images from Pexels"
+    usage_text  = "Pull and use this image for similar lambda functions"
+  }
 }
