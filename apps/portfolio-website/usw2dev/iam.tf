@@ -1,6 +1,6 @@
 # allow website GHA to push build artifacts to S3
-resource "aws_iam_role" "pwp_gha_s3" {
-  name = "PWP-GHA-S3-ReadWrite"
+resource "aws_iam_role" "pwp_gha_s3_ecr" {
+  name = "PWP-GHA-S3-ECR-ReadWrite"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -22,8 +22,8 @@ resource "aws_iam_role" "pwp_gha_s3" {
 }
 
 resource "aws_iam_policy" "pwp_gha" {
-  name        = "ReadWrite-PortfolioWebsite-S3"
-  description = "Allow the portfolio website GitHub Actions to update the latest build artifacts in S3"
+  name        = "ReadWrite-PortfolioWebsite-S3-ECR"
+  description = "Allow the portfolio website GitHub Actions to update the latest build artifacts in S3 and ECR"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -70,6 +70,26 @@ resource "aws_iam_policy" "pwp_gha" {
         Resource = [
           "*"
         ]
+      },
+      {
+        Sid    = "AllowECRGetToken"
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ],
+        Resource = ["*"]
+      },
+      {
+        Sid    = "AllowECRPush"
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:CompleteLayerUpload",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
+        ]
+        Resource = [aws_ecr_repository.lambda_container_repo.arn]
       }
     ]
   })
@@ -80,7 +100,7 @@ resource "aws_iam_policy" "pwp_gha" {
 }
 
 resource "aws_iam_role_policy_attachment" "github_actions_s3" {
-  role       = aws_iam_role.pwp_gha_s3.name
+  role       = aws_iam_role.pwp_gha_s3_ecr.name
   policy_arn = aws_iam_policy.pwp_gha.arn
 }
 
