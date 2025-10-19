@@ -14,7 +14,7 @@ output "s3_bucket_domain_name" {
 }
 
 output "portfolio_website_github_actions_role_arn" {
-  description = "ARN of the IAM role for GitHub Actions with S3 read/write access to the pwp bucket"
+  description = "ARN of the IAM role for GitHub Actions with S3 read/write access to the pwp bucket and ECR access"
   value       = aws_iam_role.pwp_gha_s3_ecr.arn
 }
 
