@@ -43,12 +43,12 @@ output "acm_certificate_subject_alternative_names" {
   value       = aws_acm_certificate.portfolio_website_cert.subject_alternative_names
 }
 
-output "ecr_repository_url" {
-  description = "URL of the public ECR repository for public access"
-  value       = aws_ecrpublic_repository.lambda_container_repo.repository_uri
+output "lambda_ecr_repository_url" {
+  description = "URL of the ECR repository for the lambda container image"
+  value       = aws_ecr_repository.lambda_container_repo.repository_url
 }
 
-output "ecr_repository_arn" {
-  description = "ARN of the public ECR repository"
-  value       = aws_ecrpublic_repository.lambda_container_repo.arn
+output "lambda_ecr_repository_arn" {
+  description = "ARN of the ECR repository for the lambda container image"
+  value       = aws_ecr_repository.lambda_container_repo.arn
 }
