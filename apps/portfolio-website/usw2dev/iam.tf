@@ -80,6 +80,14 @@ resource "aws_iam_policy" "pwp_gha" {
         Resource = ["*"]
       },
       {
+        Sid    = "AllowGetBearerToken"
+        Effect = "Allow"
+        Action = [
+          "sts:GetServiceBearerToken"
+        ]
+        Resource = ["*"]
+      },
+      {
         Sid    = "AllowECRPublicPush"
         Effect = "Allow"
         Action = [
