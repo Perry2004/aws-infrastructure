@@ -119,8 +119,34 @@ resource "aws_iam_role" "pexels_image_scraper_lambda_exec" {
   })
 }
 
+resource "aws_iam_policy" "pexels_image_scraper_lambda_custom" {
+  name        = "PexelsImageScraperLambdaCustomPolicy"
+  description = "Custom policy for the Pexels Image Scraper Lambda function"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowS3ReadWrite"
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+        ]
+        Resource = [
+          "${aws_s3_bucket.portfolio_website_bucket.arn}/website/data/*"
+        ]
+      }
+    ]
+  })
+}
+
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   role       = aws_iam_role.pexels_image_scraper_lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "pexels_image_scraper_lambda_custom_attach" {
+  role       = aws_iam_role.pexels_image_scraper_lambda_exec.name
+  policy_arn = aws_iam_policy.pexels_image_scraper_lambda_custom.arn
 }
