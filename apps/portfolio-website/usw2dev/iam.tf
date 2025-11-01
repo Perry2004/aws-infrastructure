@@ -104,8 +104,8 @@ resource "aws_iam_role_policy_attachment" "github_actions_s3" {
   policy_arn = aws_iam_policy.pwp_gha.arn
 }
 
-resource "aws_iam_role" "lambda_exec_role" {
-  name = "s3_lambda_execution_role"
+resource "aws_iam_role" "pexels_image_scraper_lambda_exec" {
+  name = "pexels_image_scraper_lambda_exec"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -121,6 +121,6 @@ resource "aws_iam_role" "lambda_exec_role" {
 
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
-  role       = aws_iam_role.lambda_exec_role.name
+  role       = aws_iam_role.pexels_image_scraper_lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
