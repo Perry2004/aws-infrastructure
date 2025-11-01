@@ -75,7 +75,7 @@ resource "aws_iam_policy" "pwp_gha" {
         Sid    = "AllowECRPublicGetToken"
         Effect = "Allow"
         Action = [
-          "ecr:GetAuthorizationToken"
+          "ecr-public:GetAuthorizationToken"
         ],
         Resource = ["*"]
       },
