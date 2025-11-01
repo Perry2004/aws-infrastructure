@@ -83,11 +83,11 @@ resource "aws_iam_policy" "pwp_gha" {
         Sid    = "AllowECRPublicPush"
         Effect = "Allow"
         Action = [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:CompleteLayerUpload",
-          "ecr:InitiateLayerUpload",
-          "ecr:PutImage",
-          "ecr:UploadLayerPart"
+          "ecr-public:BatchCheckLayerAvailability",
+          "ecr-public:CompleteLayerUpload",
+          "ecr-public:InitiateLayerUpload",
+          "ecr-public:PutImage",
+          "ecr-public:UploadLayerPart"
         ]
         Resource = [aws_ecrpublic_repository.lambda_container_repo.arn]
       }
