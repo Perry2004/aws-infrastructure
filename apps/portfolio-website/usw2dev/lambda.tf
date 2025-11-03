@@ -15,3 +15,25 @@ resource "aws_lambda_function" "pexels_image_scraper" {
 
   architectures = ["x86_64"]
 }
+
+# EventBridge rule to trigger lambda every 3 days
+resource "aws_cloudwatch_event_rule" "pexels_scraper_periodic" {
+  name                = "pexels-scraper-periodic-trigger"
+  description         = "Trigger Pexels image scraper lambda every 3 days"
+  schedule_expression = "rate(3 days)"
+}
+
+resource "aws_cloudwatch_event_target" "pexels_scraper_lambda" {
+  rule      = aws_cloudwatch_event_rule.pexels_scraper_periodic.name
+  target_id = "PexelsScraperLambda"
+  arn       = aws_lambda_function.pexels_image_scraper.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.pexels_image_scraper.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.pexels_scraper_periodic.arn
+}
+
