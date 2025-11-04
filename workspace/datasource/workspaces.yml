@@ -13,3 +13,8 @@ workspaces:
     working_directory: "apps/portfolio-website/usw2dev"
     trigger_patterns:
       - "apps/portfolio-website/_modules/**"
+  - name: "cloud-chat-app-usw2dev"
+    description: "Workspace for the infrastructure of the cloud chat app in usw2dev"
+    working_directory: "apps/cloud-chat-app/usw2dev"
+    trigger_patterns:
+      - "apps/cloud-chat-app/_modules/**"
