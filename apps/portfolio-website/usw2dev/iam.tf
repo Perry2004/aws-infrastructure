@@ -135,7 +135,18 @@ resource "aws_iam_policy" "pexels_image_scraper_lambda_custom" {
         Resource = [
           "${aws_s3_bucket.portfolio_website_bucket.arn}/website/data/*"
         ]
-      }
+      },
+      {
+        Sid    = "AllowCloudFrontInvalidation"
+        Effect = "Allow"
+        Action = [
+          "cloudfront:CreateInvalidation",
+          "cloudfront:GetInvalidation"
+        ]
+        Resource = [
+          aws_cloudfront_distribution.portfolio_website.arn
+        ]
+      },
     ]
   })
 }
