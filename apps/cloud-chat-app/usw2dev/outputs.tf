@@ -27,3 +27,8 @@ output "ses_email_identity_arn" {
   description = "ARN of the SES email identity"
   value       = aws_ses_email_identity.do_not_reply.arn
 }
+
+output "app_repositories" {
+  description = "List of ECR repositories created for the app"
+  value       = [for repo in aws_ecr_repository.app_repositories : repo]
+}
