@@ -14,3 +14,21 @@ variable "subdomain_name" {
   type        = string
   default     = "chat"
 }
+
+variable "app_full_name" {
+  description = "The full application name"
+  type        = string
+  default     = "cloud-chat-app"
+}
+
+variable "app_short_name" {
+  description = "The short application name"
+  type        = string
+  default     = "cca"
+}
+
+variable "app_repositories" {
+  description = "List of ECR repositories for the app"
+  type        = list(string)
+  default     = []
+}
