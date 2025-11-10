@@ -19,7 +19,7 @@ resource "aws_ecr_lifecycle_policy" "app_repositories_lifecycle" {
     rules = [
       {
         rulePriority = 1
-        description  = "Remove untagged images after 3 day"
+        description  = "Remove untagged images after 3 days"
         selection = {
           tagStatus   = "untagged"
           countType   = "sinceImagePushed"
