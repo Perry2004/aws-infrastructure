@@ -37,3 +37,33 @@ output "gha_iam_role_arn" {
   description = "ARN of the IAM role for GitHub Actions"
   value       = aws_iam_role.github_actions_role.arn
 }
+
+output "public_subnet_id" {
+  description = "ID of the public subnet"
+  value       = aws_subnet.cca_public.id
+}
+
+output "private_subnet_id" {
+  description = "ID of the private subnet"
+  value       = aws_subnet.cca_private.id
+}
+
+output "public_subnet_cidr" {
+  description = "CIDR block of the public subnet"
+  value       = aws_subnet.cca_public.cidr_block
+}
+
+output "private_subnet_cidr" {
+  description = "CIDR block of the private subnet"
+  value       = aws_subnet.cca_private.cidr_block
+}
+
+output "internet_gateway_id" {
+  description = "ID of the Internet Gateway"
+  value       = aws_internet_gateway.cca_igw.id
+}
+
+output "nat_gateway_id" {
+  description = "ID of the NAT Gateway"
+  value       = aws_nat_gateway.cca_nat.id
+}

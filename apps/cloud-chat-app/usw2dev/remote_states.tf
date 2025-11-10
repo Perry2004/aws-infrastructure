@@ -19,3 +19,14 @@ data "terraform_remote_state" "iam" {
     }
   }
 }
+
+data "terraform_remote_state" "vpc" {
+  backend = "remote"
+
+  config = {
+    organization = "perry-zhu-aws"
+    workspaces = {
+      name = "common-vpc"
+    }
+  }
+}
