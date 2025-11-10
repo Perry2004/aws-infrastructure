@@ -28,7 +28,12 @@ output "ses_email_identity_arn" {
   value       = aws_ses_email_identity.do_not_reply.arn
 }
 
-output "app_repositories" {
+output "app_ecr_repositories" {
   description = "List of ECR repositories created for the app"
   value       = [for repo in aws_ecr_repository.app_repositories : repo]
+}
+
+output "gha_iam_role_arn" {
+  description = "ARN of the IAM role for GitHub Actions"
+  value       = aws_iam_role.github_actions_role.arn
 }
