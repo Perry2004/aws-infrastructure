@@ -1,0 +1,68 @@
+resource "aws_iam_role" "github_actions_role" {
+  name = "${var.app_short_name}-gha-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = data.terraform_remote_state.iam.outputs.github_oidc_provider_arn
+        }
+
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringLike = {
+            "token.actions.githubusercontent.com:sub" = "repo:${var.app_github_repo}:*"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "cca_gha_policy" {
+  name        = "${upper(var.app_short_name)}-GHA-Policy"
+  description = "Policy for GitHub Actions to access ECR repositories for ${var.app_short_name}"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowTagGetting"
+        Effect = "Allow"
+        Action = [
+          "tag:GetResources"
+        ]
+        Resource = ["*"]
+      },
+      {
+        Sid    = "AllowECRGetToken"
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ],
+        Resource = ["*"]
+      },
+      {
+        Sid    = "AllowECRPush"
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:CompleteLayerUpload",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
+        ]
+        Resource = [for repo in aws_ecr_repository.app_repositories : repo.arn]
+      }
+    ]
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_role_policy_attachment" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = aws_iam_policy.cca_gha_policy.arn
+}

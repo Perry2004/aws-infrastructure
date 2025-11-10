@@ -32,3 +32,9 @@ variable "app_repositories" {
   type        = list(string)
   default     = []
 }
+
+variable "app_github_repo" {
+  description = "The GitHub repository name for the application"
+  type        = string
+  default     = "Perry2004/cloud-chat-app"
+}
