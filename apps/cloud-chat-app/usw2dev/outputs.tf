@@ -18,16 +18,6 @@ output "ses_dkim_tokens" {
   value       = aws_ses_domain_dkim.chat_domain.dkim_tokens
 }
 
-output "ses_email_identity" {
-  description = "The verified SES email identity"
-  value       = aws_ses_email_identity.do_not_reply.email
-}
-
-output "ses_email_identity_arn" {
-  description = "ARN of the SES email identity"
-  value       = aws_ses_email_identity.do_not_reply.arn
-}
-
 output "app_ecr_repositories" {
   description = "List of ECR repositories created for the app"
   value       = [for repo in aws_ecr_repository.app_repositories : repo]
