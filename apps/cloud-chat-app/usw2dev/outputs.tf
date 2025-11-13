@@ -28,24 +28,44 @@ output "gha_iam_role_arn" {
   value       = aws_iam_role.github_actions_role.arn
 }
 
-output "public_subnet_id" {
-  description = "ID of the public subnet"
-  value       = aws_subnet.cca_public.id
+output "public_subnet_a_id" {
+  description = "ID of the public subnet a"
+  value       = aws_subnet.cca_public_a.id
 }
 
-output "private_subnet_id" {
-  description = "ID of the private subnet"
-  value       = aws_subnet.cca_private.id
+output "public_subnet_b_id" {
+  description = "ID of the public subnet b"
+  value       = aws_subnet.cca_public_b.id
 }
 
-output "public_subnet_cidr" {
-  description = "CIDR block of the public subnet"
-  value       = aws_subnet.cca_public.cidr_block
+output "private_subnet_a_id" {
+  description = "ID of the private subnet a"
+  value       = aws_subnet.cca_private_a.id
 }
 
-output "private_subnet_cidr" {
-  description = "CIDR block of the private subnet"
-  value       = aws_subnet.cca_private.cidr_block
+output "private_subnet_b_id" {
+  description = "ID of the private subnet b"
+  value       = aws_subnet.cca_private_b.id
+}
+
+output "public_subnet_a_cidr" {
+  description = "CIDR block of the public subnet a"
+  value       = aws_subnet.cca_public_a.cidr_block
+}
+
+output "public_subnet_b_cidr" {
+  description = "CIDR block of the public subnet b"
+  value       = aws_subnet.cca_public_b.cidr_block
+}
+
+output "private_subnet_a_cidr" {
+  description = "CIDR block of the private subnet a"
+  value       = aws_subnet.cca_private_a.cidr_block
+}
+
+output "private_subnet_b_cidr" {
+  description = "CIDR block of the private subnet b"
+  value       = aws_subnet.cca_private_b.cidr_block
 }
 
 output "internet_gateway_id" {
@@ -53,7 +73,7 @@ output "internet_gateway_id" {
   value       = aws_internet_gateway.cca_igw.id
 }
 
-output "nat_gateway_id" {
+output "nat_gateway_a_id" {
   description = "ID of the NAT Gateway"
-  value       = aws_nat_gateway.cca_nat.id
+  value       = aws_nat_gateway.cca_nat_a.id
 }
