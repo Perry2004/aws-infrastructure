@@ -77,3 +77,28 @@ output "nat_gateway_a_id" {
   description = "ID of the NAT Gateway"
   value       = aws_nat_gateway.cca_nat_a.id
 }
+
+output "alb_arn" {
+  description = "ARN of the Application Load Balancer"
+  value       = aws_lb.cca_alb.arn
+}
+
+output "alb_dns_name" {
+  description = "DNS name of the Application Load Balancer"
+  value       = aws_lb.cca_alb.dns_name
+}
+
+output "alb_zone_id" {
+  description = "Zone ID of the Application Load Balancer"
+  value       = aws_lb.cca_alb.zone_id
+}
+
+output "alb_security_group_id" {
+  description = "Security group ID of the Application Load Balancer"
+  value       = aws_security_group.cca_alb_sg.id
+}
+
+output "alb_target_group_arn" {
+  description = "ARN of the ALB target group"
+  value       = aws_lb_target_group.cca_tg.arn
+}
