@@ -53,10 +53,10 @@ resource "aws_lb" "cca_alb" {
 }
 
 resource "aws_lb_target_group" "cca_tg" {
-  name     = "${var.app_short_name}-tg"
-  port     = var.ui_service_port
-  protocol = "HTTP"
-  vpc_id   = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
+  name_prefix = "${var.app_short_name}-"
+  port        = var.ui_service_port
+  protocol    = "HTTP"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   health_check {
     enabled             = true
@@ -71,6 +71,10 @@ resource "aws_lb_target_group" "cca_tg" {
 
   tags = {
     Name = "${var.app_short_name}-tg"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
