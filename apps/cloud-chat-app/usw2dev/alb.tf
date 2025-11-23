@@ -19,6 +19,17 @@ resource "aws_security_group" "cca_alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  egress {
+    description = "HTTP to UI service"
+    from_port   = var.ui_service_port
+    to_port     = var.ui_service_port
+    protocol    = "tcp"
+    cidr_blocks = [
+      aws_subnet.cca_private_a.cidr_block,
+      aws_subnet.cca_private_b.cidr_block
+    ]
+  }
+
   tags = {
     Name = "${var.app_short_name}-alb-sg"
   }
