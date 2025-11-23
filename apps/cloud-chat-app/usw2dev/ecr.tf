@@ -24,7 +24,7 @@ resource "aws_ecr_lifecycle_policy" "app_repositories_lifecycle" {
           tagStatus   = "untagged"
           countType   = "sinceImagePushed"
           countUnit   = "days"
-          countNumber = 3
+          countNumber = 1
         }
         action = {
           type = "expire"
