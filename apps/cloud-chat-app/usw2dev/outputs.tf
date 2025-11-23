@@ -102,3 +102,63 @@ output "alb_target_group_arn" {
   description = "ARN of the ALB target group"
   value       = aws_lb_target_group.cca_tg.arn
 }
+
+output "ecs_cluster_name" {
+  description = "Name of the ECS cluster"
+  value       = aws_ecs_cluster.cca.name
+}
+
+output "ecs_cluster_arn" {
+  description = "ARN of the ECS cluster"
+  value       = aws_ecs_cluster.cca.arn
+}
+
+output "ecs_cluster_id" {
+  description = "ID of the ECS cluster"
+  value       = aws_ecs_cluster.cca.id
+}
+
+output "ecs_capacity_provider_name" {
+  description = "Name of the ECS capacity provider"
+  value       = aws_ecs_capacity_provider.cca_ecs_cp.name
+}
+
+output "ecs_capacity_provider_arn" {
+  description = "ARN of the ECS capacity provider"
+  value       = aws_ecs_capacity_provider.cca_ecs_cp.arn
+}
+
+output "ecs_autoscaling_group_name" {
+  description = "Name of the ECS Auto Scaling Group"
+  value       = aws_autoscaling_group.ecs_asg.name
+}
+
+output "ecs_autoscaling_group_arn" {
+  description = "ARN of the ECS Auto Scaling Group"
+  value       = aws_autoscaling_group.ecs_asg.arn
+}
+
+output "ecs_launch_template_id" {
+  description = "ID of the ECS launch template"
+  value       = aws_launch_template.ecs_lt.id
+}
+
+output "ecs_launch_template_latest_version" {
+  description = "Latest version of the ECS launch template"
+  value       = aws_launch_template.ecs_lt.latest_version
+}
+
+output "ecs_instance_security_group_id" {
+  description = "Security group ID for ECS instances"
+  value       = aws_security_group.ecs_instances.id
+}
+
+output "ecs_instance_role_arn" {
+  description = "ARN of the ECS instance IAM role"
+  value       = aws_iam_role.ecs_instance_role.arn
+}
+
+output "ecs_instance_profile_arn" {
+  description = "ARN of the ECS instance profile"
+  value       = aws_iam_instance_profile.ecs_instance_profile.arn
+}
