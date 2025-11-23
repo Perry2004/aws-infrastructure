@@ -72,7 +72,8 @@ resource "aws_ecs_service" "service" {
   }
 
   depends_on = [
-    aws_cloudwatch_log_group.service
+    aws_cloudwatch_log_group.service,
+    aws_lb_listener.cca_http
   ]
 
   tags = {
