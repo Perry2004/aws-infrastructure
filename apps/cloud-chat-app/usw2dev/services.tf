@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "ui" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "/ecs/${var.app_short_name}-ui"
+          awslogs-group         = aws_cloudwatch_log_group.ui.name
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = "ecs"
         }
@@ -61,7 +61,7 @@ resource "aws_ecs_task_definition" "ui" {
 }
 
 resource "aws_cloudwatch_log_group" "ui" {
-  name              = "/ecs/${var.app_short_name}-ui"
+  name              = "/ecs/${var.app_short_name}/ui"
   retention_in_days = 7
 }
 
