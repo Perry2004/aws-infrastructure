@@ -170,7 +170,7 @@ output "ui_service_name" {
 
 output "ui_service_arn" {
   description = "ARN of the UI ECS service"
-  value       = aws_ecs_service.ui.id
+  value       = aws_ecs_service.ui.arn
 }
 
 output "ui_service_task_arn" {
