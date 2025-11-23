@@ -36,7 +36,7 @@ resource "aws_security_group" "cca_alb_sg" {
 }
 
 resource "aws_lb" "cca_alb" {
-  name               = "${var.app_short_name}-alb"
+  name_prefix        = "${var.app_short_name}-alb-"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.cca_alb_sg.id]
