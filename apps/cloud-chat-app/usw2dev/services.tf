@@ -70,7 +70,7 @@ resource "aws_ecs_service" "ui" {
   cluster                            = aws_ecs_cluster.cca.id
   task_definition                    = aws_ecs_task_definition.ui.arn
   desired_count                      = 1
-  deployment_minimum_healthy_percent = 100
+  deployment_minimum_healthy_percent = 0
   deployment_maximum_percent         = 200
 
   capacity_provider_strategy {
