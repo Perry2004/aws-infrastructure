@@ -10,6 +10,10 @@ resource "aws_iam_role" "ecs_task_execution_role" {
       }
     }]
   })
+
+  tags = {
+    Name = "${var.app_short_name}-ecs-task-execution-role"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
