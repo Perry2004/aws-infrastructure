@@ -94,5 +94,9 @@ resource "aws_ecs_service" "ui" {
     aws_lb_listener.cca_http,
     aws_cloudwatch_log_group.ui
   ]
+
+  tags = {
+    Name = "${var.app_short_name}-ui-service"
+  }
 }
 
