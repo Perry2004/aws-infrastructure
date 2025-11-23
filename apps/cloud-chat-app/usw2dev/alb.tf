@@ -36,7 +36,7 @@ resource "aws_security_group" "cca_alb_sg" {
 }
 
 resource "aws_lb" "cca_alb" {
-  name_prefix        = "${var.app_short_name}-alb-"
+  name               = "${var.app_short_name}-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.cca_alb_sg.id]
@@ -53,10 +53,10 @@ resource "aws_lb" "cca_alb" {
 }
 
 resource "aws_lb_target_group" "cca_tg" {
-  name     = "${var.app_short_name}-tg"
-  port     = var.ui_service_port
-  protocol = "HTTP"
-  vpc_id   = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
+  name_prefix = "${var.app_short_name}-"
+  port        = var.ui_service_port
+  protocol    = "HTTP"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   health_check {
     enabled             = true
