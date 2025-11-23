@@ -50,7 +50,8 @@ resource "aws_iam_policy" "cca_gha_policy" {
           "ecr:CompleteLayerUpload",
           "ecr:InitiateLayerUpload",
           "ecr:PutImage",
-          "ecr:UploadLayerPart"
+          "ecr:UploadLayerPart",
+          "ecr:BatchGetImage"
         ]
         Resource = [for repo in aws_ecr_repository.app_repositories : repo.arn]
       }
