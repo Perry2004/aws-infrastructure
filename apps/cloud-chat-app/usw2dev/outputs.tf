@@ -162,3 +162,23 @@ output "ecs_instance_profile_arn" {
   description = "ARN of the ECS instance profile"
   value       = aws_iam_instance_profile.ecs_instance_profile.arn
 }
+
+output "ui_service_name" {
+  description = "Name of the UI ECS service"
+  value       = aws_ecs_service.ui.name
+}
+
+output "ui_service_arn" {
+  description = "ARN of the UI ECS service"
+  value       = aws_ecs_service.ui.arn
+}
+
+output "ui_service_task_arn" {
+  description = "ARN of the UI task definition"
+  value       = aws_ecs_task_definition.ui.arn
+}
+
+output "ui_log_group_name" {
+  description = "Name of the CloudWatch log group for UI service"
+  value       = aws_cloudwatch_log_group.ui.name
+}

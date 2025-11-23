@@ -38,3 +38,9 @@ variable "app_github_repo" {
   type        = string
   default     = "Perry2004/cloud-chat-app"
 }
+
+variable "ui_service_port" {
+  description = "The port for the UI service"
+  type        = number
+  default     = 1688
+}

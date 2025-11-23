@@ -78,6 +78,22 @@ resource "aws_security_group" "ecs_instances" {
   name        = "${var.app_short_name}-ecs-instances-sg"
   description = "Security group for CCA ECS instances"
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
+
+  ingress {
+    description     = "UI service traffic from ALB"
+    from_port       = var.ui_service_port
+    to_port         = var.ui_service_port
+    protocol        = "tcp"
+    security_groups = [aws_security_group.cca_alb_sg.id]
+  }
+
+  egress {
+    description = "Allow all HTTPS outbound"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_iam_role" "ecs_instance_role" {
