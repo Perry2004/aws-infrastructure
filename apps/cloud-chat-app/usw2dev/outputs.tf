@@ -173,9 +173,9 @@ output "ui_service_arn" {
   value       = aws_ecs_service.ui.id
 }
 
-output "ui_service_task" {
+output "ui_service_task_arn" {
   description = "ARN of the UI task definition"
-  value       = aws_ecs_task_definition.ui
+  value       = aws_ecs_task_definition.ui.arn
 }
 
 output "ui_log_group_name" {

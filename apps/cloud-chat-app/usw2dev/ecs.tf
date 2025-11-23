@@ -86,6 +86,14 @@ resource "aws_security_group" "ecs_instances" {
     protocol        = "tcp"
     security_groups = [aws_security_group.cca_alb_sg.id]
   }
+
+  egress {
+    description = "Allow all HTTPS outbound"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_iam_role" "ecs_instance_role" {
