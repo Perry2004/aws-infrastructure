@@ -48,6 +48,7 @@ variable "services" {
     cpu                = string
     memory             = string
     desired_count      = number
+    use_load_balancer  = optional(bool, false)
   }))
   default = []
 }

@@ -15,6 +15,7 @@ services = [
     cpu                = "256"
     memory             = "512"
     desired_count      = 1
+    use_load_balancer  = true
   },
   {
     service_name       = "api_account-service"
@@ -23,5 +24,6 @@ services = [
     cpu                = "256"
     memory             = "512"
     desired_count      = 1
+    use_load_balancer  = false
   },
 ]

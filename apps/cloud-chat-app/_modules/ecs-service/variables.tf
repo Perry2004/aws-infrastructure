@@ -53,11 +53,7 @@ variable "execution_role_arn" {
 variable "target_group_arn" {
   description = "ARN of the ALB target group"
   type        = string
-}
-
-variable "lb_listener_arn" {
-  description = "ARN of the load balancer listener"
-  type        = string
+  default     = null
 }
 
 variable "log_retention_days" {

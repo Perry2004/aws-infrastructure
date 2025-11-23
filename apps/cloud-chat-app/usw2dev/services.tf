@@ -13,7 +13,6 @@ module "services" {
   cpu                    = each.value.cpu
   memory                 = each.value.memory
   execution_role_arn     = aws_iam_role.ecs_task_execution_role.arn
-  target_group_arn       = aws_lb_target_group.cca_tg.arn
-  lb_listener_arn        = aws_lb_listener.cca_http.arn
+  target_group_arn       = each.value.use_load_balancer ? aws_lb_target_group.cca_tg.arn : null
   desired_count          = each.value.desired_count
 }
