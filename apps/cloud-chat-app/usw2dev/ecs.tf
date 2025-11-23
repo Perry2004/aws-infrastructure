@@ -80,7 +80,7 @@ resource "aws_security_group" "ecs_instances" {
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   ingress {
-    description     = "HTTP from ALB"
+    description     = "UI service traffic from ALB"
     from_port       = var.ui_service_port
     to_port         = var.ui_service_port
     protocol        = "tcp"
