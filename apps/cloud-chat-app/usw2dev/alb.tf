@@ -43,7 +43,7 @@ resource "aws_lb" "cca_alb" {
 
 resource "aws_lb_target_group" "cca_tg" {
   name     = "${var.app_short_name}-tg"
-  port     = 80
+  port     = var.ui_service_port
   protocol = "HTTP"
   vpc_id   = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
