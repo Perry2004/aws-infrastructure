@@ -182,3 +182,18 @@ output "ui_log_group_name" {
   description = "Name of the CloudWatch log group for UI service"
   value       = aws_cloudwatch_log_group.ui.name
 }
+
+output "https_listener_arn" {
+  description = "ARN of the HTTPS listener"
+  value       = aws_lb_listener.cca_https.arn
+}
+
+output "http_listener_arn" {
+  description = "ARN of the HTTP listener"
+  value       = aws_lb_listener.cca_http.arn
+}
+
+output "app_url" {
+  description = "HTTPS URL of the application"
+  value       = "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}"
+}
