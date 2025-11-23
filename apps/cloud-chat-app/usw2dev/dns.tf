@@ -30,3 +30,15 @@ resource "aws_route53_record" "ses_dmarc" {
   ttl     = 600
   records = ["v=DMARC1; p=quarantine; rua=mailto:do-not-reply@${aws_ses_domain_identity.chat_domain.domain}"]
 }
+
+resource "aws_route53_record" "chat_alias" {
+  zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
+  name    = "${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.cca_alb.dns_name
+    zone_id                = aws_lb.cca_alb.zone_id
+    evaluate_target_health = true
+  }
+}
