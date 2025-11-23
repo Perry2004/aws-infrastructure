@@ -72,6 +72,10 @@ resource "aws_lb_target_group" "cca_tg" {
   tags = {
     Name = "${var.app_short_name}-tg"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener" "cca_http" {
