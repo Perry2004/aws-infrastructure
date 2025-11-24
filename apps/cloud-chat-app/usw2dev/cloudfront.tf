@@ -2,7 +2,7 @@ resource "aws_ssm_parameter" "cloudfront_header_secret" {
   name        = "/cca/cloudfront_header_secret"
   description = "Secret value for CloudFront to ALB custom header"
   type        = "SecureString"
-  value       = ""
+  value       = "CHANGE_IN_PRODUCTION"
 
   lifecycle {
     ignore_changes = [value]
