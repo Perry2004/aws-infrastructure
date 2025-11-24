@@ -1,7 +1,12 @@
-# Custom header for ALB to verify requests come from CloudFront
-resource "random_password" "cloudfront_secret" {
-  length  = 32
-  special = false
+resource "aws_ssm_parameter" "cloudfront_header_secret" {
+  name        = "/cca/cloudfront_header_secret"
+  description = "Secret value for CloudFront to ALB custom header"
+  type        = "SecureString"
+  value       = ""
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_cloudfront_distribution" "cca_distribution" {
@@ -9,7 +14,6 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
   is_ipv6_enabled     = true
   comment             = "CloudFront distribution for ${var.app_full_name}"
   default_root_object = ""
-  price_class         = "PriceClass_100"
   aliases             = ["${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}"]
 
   # Origin 1: ALB for SSR pages and assets
@@ -26,27 +30,27 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
 
     custom_header {
       name  = "X-Custom-Header"
-      value = random_password.cloudfront_secret.result
+      value = aws_ssm_parameter.cloudfront_header_secret.value
     }
   }
 
   # Origin 2: API Gateway (placeholder for future use)
-  origin {
-    domain_name = "placeholder-api-gateway.execute-api.${var.aws_region}.amazonaws.com"
-    origin_id   = "api-gateway-origin"
+  #   origin {
+  #     domain_name = "placeholder-api-gateway.execute-api.${var.aws_region}.amazonaws.com"
+  #     origin_id   = "api-gateway-origin"
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
-    }
+  #     custom_origin_config {
+  #       http_port              = 80
+  #       https_port             = 443
+  #       origin_protocol_policy = "https-only"
+  #       origin_ssl_protocols   = ["TLSv1.2"]
+  #     }
 
-    custom_header {
-      name  = "X-Custom-Header"
-      value = random_password.cloudfront_secret.result
-    }
-  }
+  #     custom_header {
+  #       name  = "X-Custom-Header"
+  #       value = random_password.cloudfront_secret.result
+  #     }
+  #   }
 
   # Behavior 0 (Priority 0): /assets/* - Build artifacts with aggressive caching
   ordered_cache_behavior {
@@ -62,18 +66,18 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
   }
 
   # Behavior 1 (Priority 1): /api/* - API Gateway with no caching
-  ordered_cache_behavior {
-    path_pattern     = "/api/*"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "api-gateway-origin"
+  # ordered_cache_behavior {
+  #   path_pattern     = "/api/*"
+  #   allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+  #   cached_methods   = ["GET", "HEAD"]
+  #   target_origin_id = "api-gateway-origin"
 
-    compress = true
+  #   compress = true
 
-    viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
-  }
+  #   viewer_protocol_policy   = "redirect-to-https"
+  #   cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
+  #   origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+  # }
 
   # Default behavior (*): SSR pages with no caching but passing all viewer info
   default_cache_behavior {

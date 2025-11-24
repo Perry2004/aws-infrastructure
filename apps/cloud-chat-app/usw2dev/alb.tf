@@ -41,12 +41,12 @@ resource "aws_security_group" "cca_alb_sg" {
 
 resource "aws_lb" "cca_alb" {
   name               = "${var.app_short_name}-alb"
-  internal           = true
+  internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.cca_alb_sg.id]
   subnets = [
-    aws_subnet.cca_private_a.id,
-    aws_subnet.cca_private_b.id
+    aws_subnet.cca_public_a.id,
+    aws_subnet.cca_public_b.id
   ]
   enable_http2                     = true
   enable_cross_zone_load_balancing = true
@@ -128,7 +128,7 @@ resource "aws_lb_listener_rule" "verify_cloudfront_header" {
   condition {
     http_header {
       http_header_name = "X-Custom-Header"
-      values           = [random_password.cloudfront_secret.result]
+      values           = [aws_ssm_parameter.cloudfront_header_secret.value]
     }
   }
 }
