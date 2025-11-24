@@ -56,10 +56,13 @@ resource "aws_ecs_service" "service" {
     base              = 0
   }
 
-  load_balancer {
-    target_group_arn = var.target_group_arn
-    container_name   = var.service_name
-    container_port   = var.container_port
+  dynamic "load_balancer" {
+    for_each = var.target_group_arn != null ? [1] : []
+    content {
+      target_group_arn = var.target_group_arn
+      container_name   = var.service_name
+      container_port   = var.container_port
+    }
   }
 
   ordered_placement_strategy {
@@ -72,8 +75,7 @@ resource "aws_ecs_service" "service" {
   }
 
   depends_on = [
-    aws_cloudwatch_log_group.service,
-    var.lb_listener_arn
+    aws_cloudwatch_log_group.service
   ]
 
   tags = {

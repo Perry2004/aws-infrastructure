@@ -163,24 +163,16 @@ output "ecs_instance_profile_arn" {
   value       = aws_iam_instance_profile.ecs_instance_profile.arn
 }
 
-output "ui_service_name" {
-  description = "Name of the UI ECS service"
-  value       = module.ui_service.service_name
-}
-
-output "ui_service_arn" {
-  description = "ARN of the UI ECS service"
-  value       = module.ui_service.service_id
-}
-
-output "ui_service_task_arn" {
-  description = "ARN of the UI task definition"
-  value       = module.ui_service.task_definition_arn
-}
-
-output "ui_log_group_name" {
-  description = "Name of the CloudWatch log group for UI service"
-  value       = module.ui_service.log_group_name
+output "services" {
+  description = "Map of all ECS services with their details"
+  value = {
+    for service_name, service in module.services : service_name => {
+      service_id          = service.service_id
+      service_name        = service.service_name
+      task_definition_arn = service.task_definition_arn
+      log_group_name      = service.log_group_name
+    }
+  }
 }
 
 output "https_listener_arn" {

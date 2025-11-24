@@ -39,8 +39,22 @@ variable "app_github_repo" {
   default     = "Perry2004/cloud-chat-app"
 }
 
+variable "services" {
+  description = "List of ECS services to deploy"
+  type = list(object({
+    service_name       = string
+    ecr_repository_key = string
+    container_port     = number
+    cpu                = string
+    memory             = string
+    desired_count      = number
+    use_load_balancer  = optional(bool, false)
+  }))
+  default = []
+}
+
 variable "ui_service_port" {
-  description = "The port for the UI service"
+  description = "The port number for the UI service"
   type        = number
   default     = 1688
 }
