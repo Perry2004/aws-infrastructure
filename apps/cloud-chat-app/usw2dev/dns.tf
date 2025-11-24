@@ -37,9 +37,9 @@ resource "aws_route53_record" "chat_alias" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.cca_alb.dns_name
-    zone_id                = aws_lb.cca_alb.zone_id
-    evaluate_target_health = true
+    name                   = aws_cloudfront_distribution.cca_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.cca_distribution.hosted_zone_id
+    evaluate_target_health = false
   }
 }
 
@@ -49,8 +49,8 @@ resource "aws_route53_record" "chat_alias_ipv6" {
   type    = "AAAA"
 
   alias {
-    name                   = aws_lb.cca_alb.dns_name
-    zone_id                = aws_lb.cca_alb.zone_id
-    evaluate_target_health = true
+    name                   = aws_cloudfront_distribution.cca_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.cca_distribution.hosted_zone_id
+    evaluate_target_health = false
   }
 }
