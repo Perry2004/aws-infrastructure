@@ -29,18 +29,18 @@ output "cloudfront_domain_name" {
 }
 
 output "acm_certificate_arn" {
-  description = "ARN of the ACM certificate for the custom domain"
-  value       = aws_acm_certificate.portfolio_website_cert.arn
+  description = "ARN of the ACM certificate for the custom domain (shared wildcard cert - us-east-1)"
+  value       = data.terraform_remote_state.dns.outputs.wildcard_certificate_arn_us_east_1
 }
 
 output "acm_certificate_domain_name" {
-  description = "Domain name covered by the ACM certificate"
-  value       = aws_acm_certificate.portfolio_website_cert.domain_name
+  description = "Domain name covered by the ACM certificate (shared wildcard cert)"
+  value       = data.terraform_remote_state.dns.outputs.wildcard_certificate_domain
 }
 
 output "acm_certificate_subject_alternative_names" {
-  description = "Subject alternative names covered by the ACM certificate"
-  value       = aws_acm_certificate.portfolio_website_cert.subject_alternative_names
+  description = "Subject alternative names covered by the ACM certificate (shared wildcard cert)"
+  value       = [data.terraform_remote_state.dns.outputs.wildcard_certificate_domain]
 }
 
 output "lambda_ecr_repository_url" {

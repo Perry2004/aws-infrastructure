@@ -1,38 +1,3 @@
-# SSL certificate
-resource "aws_acm_certificate" "portfolio_website_cert" {
-  provider                  = aws.us-east-1
-  domain_name               = data.terraform_remote_state.dns.outputs.domain_name
-  subject_alternative_names = ["www.${data.terraform_remote_state.dns.outputs.domain_name}"]
-  validation_method         = "DNS"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-# DNS validation records for ACM certificate
-resource "aws_route53_record" "portfolio_website_cert_validation" {
-  for_each = {
-    for dvo in aws_acm_certificate.portfolio_website_cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
-  name    = each.value.name
-  type    = each.value.type
-  records = [each.value.record]
-  ttl     = 60
-}
-
-resource "aws_acm_certificate_validation" "portfolio_website_cert_validation" {
-  provider                = aws.us-east-1
-  certificate_arn         = aws_acm_certificate.portfolio_website_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.portfolio_website_cert_validation : record.fqdn]
-}
-
 # DNS alias record to route domain to CloudFront distribution
 resource "aws_route53_record" "portfolio_website_alias" {
   zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
@@ -128,7 +93,7 @@ resource "aws_cloudfront_distribution" "portfolio_website" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.portfolio_website_cert.arn
+    acm_certificate_arn      = data.terraform_remote_state.dns.outputs.wildcard_certificate_arn_us_east_1
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -136,8 +101,6 @@ resource "aws_cloudfront_distribution" "portfolio_website" {
   tags = {
     Name = "PortfolioWebsite-CloudFront-${var.env_name}"
   }
-
-  depends_on = [aws_acm_certificate_validation.portfolio_website_cert_validation]
 
   lifecycle {
     create_before_destroy = true
