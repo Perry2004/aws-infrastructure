@@ -94,7 +94,7 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
 
   # SSL/TLS certificate
   viewer_certificate {
-    acm_certificate_arn      = data.terraform_remote_state.dns.outputs.wildcard_certificate_arn
+    acm_certificate_arn      = data.terraform_remote_state.dns.outputs.wildcard_certificate_arn_us_east_1
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
