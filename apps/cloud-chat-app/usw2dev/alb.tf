@@ -1,22 +1,26 @@
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
 resource "aws_security_group" "cca_alb_sg" {
   name        = "${var.app_short_name}-alb-sg"
   description = "Security group for Cloud Chat App ALB"
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   ingress {
-    description = "HTTP from anywhere"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "HTTP from CloudFront"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
   }
 
   ingress {
-    description = "HTTPS from anywhere"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "HTTPS from CloudFront"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
   }
 
   egress {
@@ -37,12 +41,12 @@ resource "aws_security_group" "cca_alb_sg" {
 
 resource "aws_lb" "cca_alb" {
   name               = "${var.app_short_name}-alb"
-  internal           = false
+  internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.cca_alb_sg.id]
   subnets = [
-    aws_subnet.cca_public_a.id,
-    aws_subnet.cca_public_b.id
+    aws_subnet.cca_private_a.id,
+    aws_subnet.cca_private_b.id
   ]
   enable_http2                     = true
   enable_cross_zone_load_balancing = true
@@ -102,7 +106,29 @@ resource "aws_lb_listener" "cca_https" {
   certificate_arn   = data.terraform_remote_state.dns.outputs.wildcard_certificate_arn
 
   default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied"
+      status_code  = "403"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "verify_cloudfront_header" {
+  listener_arn = aws_lb_listener.cca_https.arn
+  priority     = 100
+
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.cca_tg.arn
+  }
+
+  condition {
+    http_header {
+      http_header_name = "X-Custom-Header"
+      values           = [random_password.cloudfront_secret.result]
+    }
   }
 }

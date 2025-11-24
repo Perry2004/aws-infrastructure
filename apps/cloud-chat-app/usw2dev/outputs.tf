@@ -189,3 +189,18 @@ output "app_url" {
   description = "HTTPS URL of the application"
   value       = "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}"
 }
+
+output "cloudfront_distribution_id" {
+  description = "ID of the CloudFront distribution"
+  value       = aws_cloudfront_distribution.cca_distribution.id
+}
+
+output "cloudfront_distribution_arn" {
+  description = "ARN of the CloudFront distribution"
+  value       = aws_cloudfront_distribution.cca_distribution.arn
+}
+
+output "cloudfront_domain_name" {
+  description = "Domain name of the CloudFront distribution"
+  value       = aws_cloudfront_distribution.cca_distribution.domain_name
+}
