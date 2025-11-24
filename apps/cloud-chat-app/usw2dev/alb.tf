@@ -8,14 +8,6 @@ resource "aws_security_group" "cca_alb_sg" {
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   ingress {
-    description     = "HTTP from CloudFront"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-  }
-
-  ingress {
     description     = "HTTPS from CloudFront"
     from_port       = 443
     to_port         = 443
@@ -79,22 +71,6 @@ resource "aws_lb_target_group" "cca_tg" {
 
   lifecycle {
     create_before_destroy = true
-  }
-}
-
-resource "aws_lb_listener" "cca_http" {
-  load_balancer_arn = aws_lb.cca_alb.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
   }
 }
 
