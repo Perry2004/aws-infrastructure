@@ -12,7 +12,7 @@ resource "aws_ssm_parameter" "cloudfront_header_secret" {
 resource "aws_cloudfront_distribution" "cca_distribution" {
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "${var.app_full_name}  distribution"
+  comment             = "${var.app_full_name} distribution"
   default_root_object = ""
   aliases             = ["${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}"]
 
