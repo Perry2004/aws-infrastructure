@@ -61,8 +61,9 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
 
     compress = true
 
-    viewer_protocol_policy = "redirect-to-https"
-    cache_policy_id        = data.aws_cloudfront_cache_policy.caching_optimized.id
+    viewer_protocol_policy   = "redirect-to-https"
+    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_optimized.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.forward_host.id
   }
 
   # Behavior 1 (Priority 1): /api/* - API Gateway with no caching
@@ -122,4 +123,25 @@ data "aws_cloudfront_cache_policy" "caching_disabled" {
 # Data sources for managed origin request policies
 data "aws_cloudfront_origin_request_policy" "all_viewer" {
   name = "Managed-AllViewer"
+}
+
+# Custom origin request policy to include header forwarding
+resource "aws_cloudfront_origin_request_policy" "forward_host" {
+  name    = "${var.app_short_name}-forward-host"
+  comment = "Origin request policy to forward only the Host header to the origin (preserve original Host for ALB)"
+
+  headers_config {
+    header_behavior = "whitelist"
+    headers {
+      items = ["Host"]
+    }
+  }
+
+  cookies_config {
+    cookie_behavior = "none"
+  }
+
+  query_strings_config {
+    query_string_behavior = "none"
+  }
 }
