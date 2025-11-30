@@ -81,14 +81,14 @@ resource "aws_s3_bucket_policy" "cca_alb_logs_policy" {
         Principal = {
           Service = "elasticloadbalancing.amazonaws.com"
         },
-        Action   = "s3:PutObject",
-        Resource = "arn:aws:s3:::${var.alb_access_logs_bucket_name != "" ? var.alb_access_logs_bucket_name : aws_s3_bucket.cca_alb_logs[0].id}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
-        Condition = {
-          StringEquals = {
-            "s3:x-amz-acl" : "bucket-owner-full-control",
-            "aws:SourceAccount" : data.aws_caller_identity.current.account_id
-          }
-        }
+        Action = [
+          "s3:PutObject",
+          "s3:GetBucketAcl"
+        ],
+        Resource = [
+          "arn:aws:s3:::${var.alb_access_logs_bucket_name != "" ? var.alb_access_logs_bucket_name : aws_s3_bucket.cca_alb_logs[0].id}",
+          "arn:aws:s3:::${var.alb_access_logs_bucket_name != "" ? var.alb_access_logs_bucket_name : aws_s3_bucket.cca_alb_logs[0].id}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+        ]
       }
     ]
   })
