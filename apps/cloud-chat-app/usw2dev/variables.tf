@@ -58,3 +58,33 @@ variable "ui_service_port" {
   type        = number
   default     = 1688
 }
+
+variable "enable_alb_access_logs" {
+  description = "Enable ALB access logs to S3"
+  type        = bool
+  default     = true
+}
+
+variable "alb_access_logs_bucket_name" {
+  description = "Optional pre-existing S3 bucket to use for ALB access logs. If empty, a new bucket will be created."
+  type        = string
+  default     = ""
+}
+
+variable "alb_access_logs_bucket_prefix" {
+  description = "Prefix to use for ALB logs inside the S3 bucket (do not use 'AWSLogs')."
+  type        = string
+  default     = "alb-logs"
+}
+
+variable "enable_apigw_access_logs" {
+  description = "Enable API Gateway HTTP (apigatewayv2) access logs to CloudWatch"
+  type        = bool
+  default     = true
+}
+
+variable "apigw_access_log_retention_days" {
+  description = "CloudWatch Log retention in days for the API Gateway access logs"
+  type        = number
+  default     = 30
+}

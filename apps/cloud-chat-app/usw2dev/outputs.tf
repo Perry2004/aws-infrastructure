@@ -235,6 +235,21 @@ output "apigateway_stage" {
   value       = aws_apigatewayv2_stage.cca_stage.name
 }
 
+output "apigateway_access_logs_enabled" {
+  description = "Whether API Gateway access logs are enabled"
+  value       = var.enable_apigw_access_logs
+}
+
+output "apigateway_access_log_group_name" {
+  description = "CloudWatch Log Group name for API Gateway access logs"
+  value       = var.enable_apigw_access_logs ? aws_cloudwatch_log_group.apigw_access_logs[0].name : ""
+}
+
+output "apigateway_access_log_group_arn" {
+  description = "ARN of the CloudWatch Log Group for API Gateway access logs"
+  value       = var.enable_apigw_access_logs ? aws_cloudwatch_log_group.apigw_access_logs[0].arn : ""
+}
+
 output "apigateway_vpc_link_id" {
   description = "ID of the API Gateway VPC Link"
   value       = aws_apigatewayv2_vpc_link.cca_vpc_link.id
@@ -243,4 +258,14 @@ output "apigateway_vpc_link_id" {
 output "apigateway_vpc_link_arn" {
   description = "ARN of the API Gateway VPC Link"
   value       = aws_apigatewayv2_vpc_link.cca_vpc_link.arn
+}
+
+output "alb_logs_bucket_name" {
+  description = "S3 bucket name used for ALB access logs"
+  value       = var.alb_access_logs_bucket_name != "" ? var.alb_access_logs_bucket_name : (length(aws_s3_bucket.cca_alb_logs) > 0 ? aws_s3_bucket.cca_alb_logs[0].id : "")
+}
+
+output "alb_logs_bucket_arn" {
+  description = "S3 bucket ARN used for ALB access logs"
+  value       = var.alb_access_logs_bucket_name != "" ? "arn:aws:s3:::${var.alb_access_logs_bucket_name}" : (length(aws_s3_bucket.cca_alb_logs) > 0 ? aws_s3_bucket.cca_alb_logs[0].arn : "")
 }

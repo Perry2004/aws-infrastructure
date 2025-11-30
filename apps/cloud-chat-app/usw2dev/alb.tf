@@ -43,6 +43,12 @@ resource "aws_lb" "cca_alb" {
   enable_http2                     = true
   enable_cross_zone_load_balancing = true
 
+  access_logs {
+    enabled = var.enable_alb_access_logs
+    bucket  = var.alb_access_logs_bucket_name != "" ? var.alb_access_logs_bucket_name : aws_s3_bucket.cca_alb_logs[0].id
+    prefix  = var.alb_access_logs_bucket_prefix
+  }
+
   tags = {
     Name = "${var.app_short_name}-alb"
   }
@@ -124,6 +130,12 @@ resource "aws_lb" "cca_api_alb" {
 
   enable_http2                     = false
   enable_cross_zone_load_balancing = true
+
+  access_logs {
+    enabled = var.enable_alb_access_logs
+    bucket  = var.alb_access_logs_bucket_name != "" ? var.alb_access_logs_bucket_name : aws_s3_bucket.cca_alb_logs[0].id
+    prefix  = var.alb_access_logs_bucket_prefix
+  }
 
   tags = {
     Name = "${var.app_short_name}-api-alb"
