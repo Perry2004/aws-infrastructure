@@ -77,7 +77,7 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
 
     viewer_protocol_policy   = "redirect-to-https"
     cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.api_gateway_no_host.id
   }
 
   # Behavior for the base /api/v1 (exact match)
@@ -91,7 +91,7 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
 
     viewer_protocol_policy   = "redirect-to-https"
     cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.api_gateway_no_host.id
   }
 
   # Default behavior (*): SSR pages with no caching but passing all viewer info
@@ -157,5 +157,23 @@ resource "aws_cloudfront_origin_request_policy" "forward_host" {
 
   query_strings_config {
     query_string_behavior = "none"
+  }
+}
+
+# Custom origin request policy for API Gateway - don't forward Host header
+resource "aws_cloudfront_origin_request_policy" "api_gateway_no_host" {
+  name    = "${var.app_short_name}-api-gateway-no-host"
+  comment = "Origin request policy for API Gateway that doesn't forward Host header"
+
+  headers_config {
+    header_behavior = "none"
+  }
+
+  cookies_config {
+    cookie_behavior = "none"
+  }
+
+  query_strings_config {
+    query_string_behavior = "all"
   }
 }
