@@ -45,6 +45,42 @@ resource "aws_apigatewayv2_api" "cca_api" {
   description   = "HTTP API for ${var.app_full_name} that proxies /api/v1/account to ALB"
 }
 
+resource "aws_cloudwatch_log_group" "apigw_access_logs" {
+  count             = var.enable_apigw_access_logs ? 1 : 0
+  name              = "/aws/apigateway/${var.app_short_name}-${var.env_name}-http-api"
+  retention_in_days = var.apigw_access_log_retention_days
+  tags = {
+    Name = "${var.app_short_name}-http-api-access-logs"
+  }
+}
+
+resource "aws_cloudwatch_log_resource_policy" "apigw_logs_policy" {
+  count = var.enable_apigw_access_logs ? 1 : 0
+
+  policy_name     = "${var.app_short_name}-${var.env_name}-apigw-logs-policy"
+  policy_document = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowAPIGatewayCloudWatchLogs",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:CreateLogGroup",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.apigw_access_logs[0].name}:*"
+    }
+  ]
+}
+POLICY
+}
+
 resource "aws_apigatewayv2_integration" "account_integration" {
   api_id                 = aws_apigatewayv2_api.cca_api.id
   integration_type       = "HTTP_PROXY"
@@ -81,6 +117,25 @@ resource "aws_apigatewayv2_stage" "cca_stage" {
   api_id      = aws_apigatewayv2_api.cca_api.id
   name        = var.env_name
   auto_deploy = true
+
+  dynamic "access_log_settings" {
+    for_each = var.enable_apigw_access_logs ? [1] : []
+    content {
+      destination_arn = aws_cloudwatch_log_group.apigw_access_logs[0].arn
+      format = jsonencode({
+        requestId          = "$context.requestId",
+        ip                 = "$context.identity.sourceIp",
+        requestTime        = "$context.requestTime",
+        httpMethod         = "$context.httpMethod",
+        routeKey           = "$context.routeKey",
+        path               = "$context.path",
+        status             = "$context.status",
+        protocol           = "$context.protocol",
+        responseLength     = "$context.responseLength",
+        integrationLatency = "$context.integrationLatency"
+      })
+    }
+  }
 }
 
 // NOTE: Moved invocation URL and other API outputs to `outputs.tf` for centralised module outputs

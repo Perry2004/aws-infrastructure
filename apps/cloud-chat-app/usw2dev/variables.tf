@@ -76,3 +76,15 @@ variable "alb_access_logs_bucket_prefix" {
   type        = string
   default     = "alb-logs"
 }
+
+variable "enable_apigw_access_logs" {
+  description = "Enable API Gateway HTTP (apigatewayv2) access logs to CloudWatch"
+  type        = bool
+  default     = true
+}
+
+variable "apigw_access_log_retention_days" {
+  description = "CloudWatch Log retention in days for the API Gateway access logs"
+  type        = number
+  default     = 30
+}
