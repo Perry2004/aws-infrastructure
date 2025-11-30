@@ -89,6 +89,9 @@ resource "aws_apigatewayv2_integration" "account_integration" {
   connection_type        = "VPC_LINK"
   connection_id          = aws_apigatewayv2_vpc_link.cca_vpc_link.id
   payload_format_version = "1.0"
+  request_parameters = {
+    "overwrite:path" = "/api/v1/account"
+  }
 }
 
 resource "aws_apigatewayv2_integration" "account_proxy_integration" {
@@ -99,6 +102,10 @@ resource "aws_apigatewayv2_integration" "account_proxy_integration" {
   connection_type        = "VPC_LINK"
   connection_id          = aws_apigatewayv2_vpc_link.cca_vpc_link.id
   payload_format_version = "1.0"
+  # This strips the stage name by forcing the path to /api/v1/account/ + whatever follows
+  request_parameters = {
+    "overwrite:path" = "/api/v1/account/$request.path.proxy"
+  }
 }
 
 resource "aws_apigatewayv2_route" "account_route" {
