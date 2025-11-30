@@ -23,6 +23,17 @@ resource "aws_security_group" "cca_apigw_vpclink_sg" {
     ]
   }
 
+  egress {
+    description = "Allow outbound to ALB listener port for API Gateway VPC link"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [
+      aws_subnet.cca_private_a.cidr_block,
+      aws_subnet.cca_private_b.cidr_block
+    ]
+  }
+
   tags = {
     Name = "${var.app_short_name}-apigw-vpclink-sg"
   }
@@ -38,7 +49,7 @@ resource "aws_apigatewayv2_integration" "account_integration" {
   api_id                 = aws_apigatewayv2_api.cca_api.id
   integration_type       = "HTTP_PROXY"
   integration_method     = "ANY"
-  integration_uri        = "http://${aws_lb.cca_api_alb.dns_name}/api/v1/account"
+  integration_uri        = aws_lb_listener.cca_api_alb_listener.arn
   connection_type        = "VPC_LINK"
   connection_id          = aws_apigatewayv2_vpc_link.cca_vpc_link.id
   payload_format_version = "1.0"
@@ -48,7 +59,7 @@ resource "aws_apigatewayv2_integration" "account_proxy_integration" {
   api_id                 = aws_apigatewayv2_api.cca_api.id
   integration_type       = "HTTP_PROXY"
   integration_method     = "ANY"
-  integration_uri        = "http://${aws_lb.cca_api_alb.dns_name}/api/v1/account/{proxy}"
+  integration_uri        = aws_lb_listener.cca_api_alb_listener.arn
   connection_type        = "VPC_LINK"
   connection_id          = aws_apigatewayv2_vpc_link.cca_vpc_link.id
   payload_format_version = "1.0"
