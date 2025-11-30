@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+data "aws_elb_service_account" "main" {}
 
 locals {
   alb_logs_bucket = var.alb_access_logs_bucket_name != "" ? var.alb_access_logs_bucket_name : "${var.app_short_name}-${var.env_name}-alb-logs"
@@ -79,7 +80,7 @@ resource "aws_s3_bucket_policy" "cca_alb_logs_policy" {
         Sid    = "ELBLogDeliveryPolicy",
         Effect = "Allow",
         Principal = {
-          Service = "elasticloadbalancing.amazonaws.com"
+          AWS = data.aws_elb_service_account.main.arn
         },
         Action = [
           "s3:PutObject",
