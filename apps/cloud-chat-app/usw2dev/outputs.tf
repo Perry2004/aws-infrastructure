@@ -103,6 +103,21 @@ output "alb_target_group_arn" {
   value       = aws_lb_target_group.cca_tg.arn
 }
 
+output "api_alb_arn" {
+  description = "ARN of the API Application Load Balancer"
+  value       = aws_lb.cca_api_alb.arn
+}
+
+output "api_alb_dns_name" {
+  description = "DNS name of the API Application Load Balancer"
+  value       = aws_lb.cca_api_alb.dns_name
+}
+
+output "api_alb_account_target_group_arn" {
+  description = "ARN of the API ALB account target group"
+  value       = aws_lb_target_group.cca_account_tg.arn
+}
+
 output "ecs_cluster_name" {
   description = "Name of the ECS cluster"
   value       = aws_ecs_cluster.cca.name
@@ -198,4 +213,34 @@ output "cloudfront_distribution_arn" {
 output "cloudfront_domain_name" {
   description = "Domain name of the CloudFront distribution"
   value       = aws_cloudfront_distribution.cca_distribution.domain_name
+}
+
+output "http_api_invoke_url" {
+  description = "Invoke URL of the HTTP API Gateway (apigatewayv2)"
+  value       = "${replace(aws_apigatewayv2_api.cca_api.api_endpoint, "https://", "")}/${aws_apigatewayv2_stage.cca_stage.name}"
+}
+
+output "apigateway_api_id" {
+  description = "ID of the HTTP API Gateway (apigatewayv2)"
+  value       = aws_apigatewayv2_api.cca_api.id
+}
+
+output "apigateway_api_endpoint" {
+  description = "Full endpoint URL for the HTTP API Gateway"
+  value       = aws_apigatewayv2_api.cca_api.api_endpoint
+}
+
+output "apigateway_stage" {
+  description = "Stage name for the HTTP API Gateway"
+  value       = aws_apigatewayv2_stage.cca_stage.name
+}
+
+output "apigateway_vpc_link_id" {
+  description = "ID of the API Gateway VPC Link"
+  value       = aws_apigatewayv2_vpc_link.cca_vpc_link.id
+}
+
+output "apigateway_vpc_link_arn" {
+  description = "ARN of the API Gateway VPC Link"
+  value       = aws_apigatewayv2_vpc_link.cca_vpc_link.arn
 }

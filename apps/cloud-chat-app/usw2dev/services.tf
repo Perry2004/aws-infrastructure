@@ -1,3 +1,10 @@
+locals {
+  service_target_group_arns = {
+    "ui"                  = aws_lb_target_group.cca_tg.arn
+    "api_account-service" = aws_lb_target_group.cca_account_tg.arn
+  }
+}
+
 module "services" {
   source = "../_modules/ecs-service"
 
@@ -13,6 +20,6 @@ module "services" {
   cpu                    = each.value.cpu
   memory                 = each.value.memory
   execution_role_arn     = aws_iam_role.ecs_task_execution_role.arn
-  target_group_arn       = each.value.use_load_balancer ? aws_lb_target_group.cca_tg.arn : null
+  target_group_arn       = each.value.use_load_balancer ? lookup(local.service_target_group_arns, each.value.service_name, aws_lb_target_group.cca_tg.arn) : null
   desired_count          = each.value.desired_count
 }
