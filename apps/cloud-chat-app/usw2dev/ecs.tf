@@ -87,6 +87,14 @@ resource "aws_security_group" "ecs_instances" {
     security_groups = [aws_security_group.cca_alb_sg.id]
   }
 
+  ingress {
+    description     = "Account service traffic from internal API ALB"
+    from_port       = 6666
+    to_port         = 6666
+    protocol        = "tcp"
+    security_groups = [aws_security_group.cca_api_alb_sg.id]
+  }
+
   egress {
     description = "Allow all HTTPS outbound"
     from_port   = 443

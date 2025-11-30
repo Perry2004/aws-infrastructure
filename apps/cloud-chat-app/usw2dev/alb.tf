@@ -74,6 +74,119 @@ resource "aws_lb_target_group" "cca_tg" {
   }
 }
 
+# internal NLB for API Gateway
+resource "aws_security_group" "cca_api_alb_sg" {
+  name        = "${var.app_short_name}-api-alb-sg"
+  description = "Security group for internal API Application Load Balancer"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
+
+  ingress {
+    description     = "HTTP from API Gateway VPC Link ENIs"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.cca_apigw_vpclink_sg.id]
+  }
+
+  ingress {
+    description = "Allow HTTP from private subnets so ALB can be reached internally"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [
+      aws_subnet.cca_private_a.cidr_block,
+      aws_subnet.cca_private_b.cidr_block
+    ]
+  }
+
+  egress {
+    description = "Allow all outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.app_short_name}-api-alb-sg"
+  }
+}
+
+resource "aws_lb" "cca_api_alb" {
+  name               = "${var.app_short_name}-api-alb"
+  internal           = true
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.cca_api_alb_sg.id]
+  subnets = [
+    aws_subnet.cca_private_a.id,
+    aws_subnet.cca_private_b.id,
+  ]
+
+  enable_http2                     = false
+  enable_cross_zone_load_balancing = true
+
+  tags = {
+    Name = "${var.app_short_name}-api-alb"
+  }
+}
+
+resource "aws_lb_target_group" "cca_account_tg" {
+  name        = "${var.app_short_name}-account-tg"
+  port        = 6666
+  protocol    = "HTTP"
+  target_type = "instance"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    interval            = 30
+    protocol            = "HTTP"
+  }
+
+  tags = {
+    Name = "${var.app_short_name}-account-tg"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_listener" "cca_api_alb_listener" {
+  load_balancer_arn = aws_lb.cca_api_alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Not Found"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "api_account_forward" {
+  listener_arn = aws_lb_listener.cca_api_alb_listener.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.cca_account_tg.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/v1/account*", "/api/v1/account"]
+    }
+  }
+}
+
 resource "aws_lb_listener" "cca_https" {
   load_balancer_arn = aws_lb.cca_alb.arn
   port              = "443"

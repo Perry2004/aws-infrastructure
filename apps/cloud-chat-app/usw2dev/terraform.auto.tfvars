@@ -24,6 +24,6 @@ services = [
     cpu                = "256"
     memory             = "512"
     desired_count      = 1
-    use_load_balancer  = false
+    use_load_balancer  = true
   },
 ]

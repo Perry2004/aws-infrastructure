@@ -34,23 +34,23 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
     }
   }
 
-  # Origin 2: API Gateway (placeholder for future use)
-  #   origin {
-  #     domain_name = "placeholder-api-gateway.execute-api.${var.aws_region}.amazonaws.com"
-  #     origin_id   = "api-gateway-origin"
+  # Origin 2: API Gateway
+  origin {
+    domain_name = replace(aws_apigatewayv2_api.cca_api.api_endpoint, "https://", "")
+    origin_id   = "api-gateway-origin"
+    origin_path = "/${aws_apigatewayv2_stage.cca_stage.name}"
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
 
-  #     custom_origin_config {
-  #       http_port              = 80
-  #       https_port             = 443
-  #       origin_protocol_policy = "https-only"
-  #       origin_ssl_protocols   = ["TLSv1.2"]
-  #     }
-
-  #     custom_header {
-  #       name  = "X-Custom-Header"
-  #       value = random_password.cloudfront_secret.result
-  #     }
-  #   }
+    custom_header {
+      name  = "X-Custom-Header"
+      value = aws_ssm_parameter.cloudfront_header_secret.value
+    }
+  }
 
   # Behavior 0 (Priority 0): /assets/* - Build artifacts with aggressive caching
   ordered_cache_behavior {
@@ -67,18 +67,32 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
   }
 
   # Behavior 1 (Priority 1): /api/* - API Gateway with no caching
-  # ordered_cache_behavior {
-  #   path_pattern     = "/api/*"
-  #   allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-  #   cached_methods   = ["GET", "HEAD"]
-  #   target_origin_id = "api-gateway-origin"
+  ordered_cache_behavior {
+    path_pattern     = "/api/v1/*"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "api-gateway-origin"
 
-  #   compress = true
+    compress = true
 
-  #   viewer_protocol_policy   = "redirect-to-https"
-  #   cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
-  #   origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
-  # }
+    viewer_protocol_policy   = "redirect-to-https"
+    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+  }
+
+  # Behavior for the base /api/v1 (exact match)
+  ordered_cache_behavior {
+    path_pattern     = "/api/v1"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "api-gateway-origin"
+
+    compress = true
+
+    viewer_protocol_policy   = "redirect-to-https"
+    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+  }
 
   # Default behavior (*): SSR pages with no caching but passing all viewer info
   default_cache_behavior {
