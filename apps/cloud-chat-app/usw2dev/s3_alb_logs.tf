@@ -81,12 +81,7 @@ resource "aws_s3_bucket_policy" "cca_alb_logs_policy" {
         Principal = {
           Service = "elasticloadbalancing.amazonaws.com"
         },
-        Action = [
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:CreateMultipartUpload",
-          "s3:AbortMultipartUpload"
-        ],
+        Action   = "s3:PutObject",
         Resource = "arn:aws:s3:::${var.alb_access_logs_bucket_name != "" ? var.alb_access_logs_bucket_name : aws_s3_bucket.cca_alb_logs[0].id}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
         Condition = {
           StringEquals = {
