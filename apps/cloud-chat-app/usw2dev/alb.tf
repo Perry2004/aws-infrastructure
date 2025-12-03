@@ -31,8 +31,9 @@ resource "aws_security_group" "cca_alb_sg" {
   }
 }
 
+# alb between the cloudfront and the UI service
 resource "aws_lb" "cca_alb" {
-  name               = "${var.app_short_name}-alb"
+  name               = "${var.app_short_name}-ui-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.cca_alb_sg.id]
@@ -50,7 +51,7 @@ resource "aws_lb" "cca_alb" {
   }
 
   tags = {
-    Name = "${var.app_short_name}-alb"
+    Name = "${var.app_short_name}-ui-alb"
   }
 }
 
@@ -66,7 +67,7 @@ resource "aws_lb_target_group" "cca_tg" {
     unhealthy_threshold = 2
     timeout             = 5
     interval            = 30
-    path                = "/"
+    path                = "/health"
     protocol            = "HTTP"
     matcher             = "200"
   }
@@ -80,7 +81,7 @@ resource "aws_lb_target_group" "cca_tg" {
   }
 }
 
-# internal NLB for API Gateway
+# sg for the internal alb after the API Gateway
 resource "aws_security_group" "cca_api_alb_sg" {
   name        = "${var.app_short_name}-api-alb-sg"
   description = "Security group for internal API Application Load Balancer"
@@ -106,11 +107,14 @@ resource "aws_security_group" "cca_api_alb_sg" {
   }
 
   egress {
-    description = "Allow all outbound"
+    description = "Allow outbound to private subnets"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [
+      aws_subnet.cca_private_a.cidr_block,
+      aws_subnet.cca_private_b.cidr_block
+    ]
   }
 
   tags = {
@@ -118,6 +122,7 @@ resource "aws_security_group" "cca_api_alb_sg" {
   }
 }
 
+# internal alb after the API Gateway
 resource "aws_lb" "cca_api_alb" {
   name               = "${var.app_short_name}-api-alb"
   internal           = true
@@ -155,7 +160,7 @@ resource "aws_lb_target_group" "cca_account_tg" {
     unhealthy_threshold = 2
     timeout             = 5
     interval            = 30
-    path                = "/api/v1/account"
+    path                = "/api/v1/account/health"
     protocol            = "HTTP"
   }
 
@@ -168,6 +173,7 @@ resource "aws_lb_target_group" "cca_account_tg" {
   }
 }
 
+# 404 for unmatched routes
 resource "aws_lb_listener" "cca_api_alb_listener" {
   load_balancer_arn = aws_lb.cca_api_alb.arn
   port              = 80
@@ -184,6 +190,7 @@ resource "aws_lb_listener" "cca_api_alb_listener" {
   }
 }
 
+# forward /api/v1/account* to the account service target group
 resource "aws_lb_listener_rule" "api_account_forward" {
   listener_arn = aws_lb_listener.cca_api_alb_listener.arn
   priority     = 100
@@ -200,6 +207,7 @@ resource "aws_lb_listener_rule" "api_account_forward" {
   }
 }
 
+# ensure https after the cloudfront
 resource "aws_lb_listener" "cca_https" {
   load_balancer_arn = aws_lb.cca_alb.arn
   port              = "443"
@@ -218,6 +226,7 @@ resource "aws_lb_listener" "cca_https" {
   }
 }
 
+# allow only requests from the cloudfront by verifying the custom header
 resource "aws_lb_listener_rule" "verify_cloudfront_header" {
   listener_arn = aws_lb_listener.cca_https.arn
   priority     = 100

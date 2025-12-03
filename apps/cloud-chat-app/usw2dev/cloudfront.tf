@@ -52,7 +52,7 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
     }
   }
 
-  # Behavior 0 (Priority 0): /assets/* - Build artifacts with aggressive caching
+  # Behavior 0 (Priority 0): /assets/* - Build artifacts with aggressive caching (e.g. images, built js/css)
   ordered_cache_behavior {
     path_pattern     = "/assets/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
@@ -69,20 +69,6 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
   # Behavior 1 (Priority 1): /api/* - API Gateway with no caching
   ordered_cache_behavior {
     path_pattern     = "/api/v1/*"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "api-gateway-origin"
-
-    compress = true
-
-    viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
-    origin_request_policy_id = aws_cloudfront_origin_request_policy.api_gateway_no_host.id
-  }
-
-  # Behavior for the base /api/v1 (exact match)
-  ordered_cache_behavior {
-    path_pattern     = "/api/v1"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "api-gateway-origin"
@@ -160,7 +146,7 @@ resource "aws_cloudfront_origin_request_policy" "forward_host" {
   }
 }
 
-# Custom origin request policy for API Gateway - don't forward Host header
+# Custom origin request policy for API Gateway - don't forward Host header since it causes 403
 resource "aws_cloudfront_origin_request_policy" "api_gateway_no_host" {
   name    = "${var.app_short_name}-api-gateway-no-host"
   comment = "Origin request policy for API Gateway that doesn't forward Host header"

@@ -39,12 +39,14 @@ resource "aws_security_group" "cca_apigw_vpclink_sg" {
   }
 }
 
+# http api gateway
 resource "aws_apigatewayv2_api" "cca_api" {
   name          = "${var.app_short_name}-http-api"
   protocol_type = "HTTP"
   description   = "HTTP API for ${var.app_full_name} that proxies /api/v1/account to ALB"
 }
 
+# log for api gateway access to cloudwatch
 resource "aws_cloudwatch_log_group" "apigw_access_logs" {
   count             = var.enable_apigw_access_logs ? 1 : 0
   name              = "/aws/apigateway/${var.app_short_name}-${var.env_name}-http-api"
@@ -81,6 +83,7 @@ resource "aws_cloudwatch_log_resource_policy" "apigw_logs_policy" {
 POLICY
 }
 
+# integration for account service
 resource "aws_apigatewayv2_integration" "account_integration" {
   api_id                 = aws_apigatewayv2_api.cca_api.id
   integration_type       = "HTTP_PROXY"
@@ -144,6 +147,3 @@ resource "aws_apigatewayv2_stage" "cca_stage" {
     }
   }
 }
-
-// NOTE: Moved invocation URL and other API outputs to `outputs.tf` for centralised module outputs
-
