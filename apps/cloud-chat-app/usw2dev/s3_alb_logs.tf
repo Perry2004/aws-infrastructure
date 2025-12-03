@@ -1,3 +1,4 @@
+# S3 bucket to store ALB access logs
 data "aws_caller_identity" "current" {}
 data "aws_elb_service_account" "main" {}
 
@@ -15,10 +16,9 @@ resource "aws_s3_bucket" "cca_alb_logs" {
     Name        = "${var.app_short_name}-alb-logs"
     Environment = var.env_name
   }
-
-  # encryption, versioning, lifecycle configuration managed outside of resource to match project style
 }
 
+# make the bucket private
 resource "aws_s3_bucket_public_access_block" "cca_alb_logs" {
   count                   = var.enable_alb_access_logs && var.alb_access_logs_bucket_name == "" ? 1 : 0
   bucket                  = aws_s3_bucket.cca_alb_logs[0].id
