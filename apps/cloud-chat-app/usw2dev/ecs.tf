@@ -75,7 +75,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
 }
 
 resource "aws_security_group" "ecs_instances" {
-  name        = "${var.app_short_name}-ecs-instances-sg"
+  name_prefix = "${var.app_short_name}-ecs-instances-sg"
   description = "Security group for CCA ECS instances"
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
@@ -101,6 +101,10 @@ resource "aws_security_group" "ecs_instances" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
