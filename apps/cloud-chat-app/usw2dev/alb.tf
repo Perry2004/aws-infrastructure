@@ -3,7 +3,7 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 }
 
 resource "aws_security_group" "cca_alb_sg" {
-  name        = "${var.app_short_name}-ui-alb-sg"
+  name_prefix = "${var.app_short_name}-ui-alb-sg"
   description = "Security group for Cloud Chat App UI ALB"
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
@@ -28,6 +28,10 @@ resource "aws_security_group" "cca_alb_sg" {
 
   tags = {
     Name = "${var.app_short_name}-ui-alb-sg"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -84,7 +88,7 @@ resource "aws_lb_target_group" "cca_tg" {
 
 # sg for the internal alb after the API Gateway
 resource "aws_security_group" "cca_api_alb_sg" {
-  name        = "${var.app_short_name}-api-alb-sg"
+  name_prefix = "${var.app_short_name}-api-alb-sg"
   description = "Security group for internal API Application Load Balancer"
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
@@ -120,6 +124,10 @@ resource "aws_security_group" "cca_api_alb_sg" {
 
   tags = {
     Name = "${var.app_short_name}-api-alb-sg"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

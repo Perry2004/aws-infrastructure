@@ -8,7 +8,7 @@ resource "aws_apigatewayv2_vpc_link" "cca_vpc_link" {
 }
 
 resource "aws_security_group" "cca_apigw_vpclink_sg" {
-  name        = "${var.app_short_name}-apigw-vpclink-sg"
+  name_prefix = "${var.app_short_name}-apigw-vpclink-sg"
   description = "Security group for API Gateway VPC Link ENIs"
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
@@ -36,6 +36,10 @@ resource "aws_security_group" "cca_apigw_vpclink_sg" {
 
   tags = {
     Name = "${var.app_short_name}-apigw-vpclink-sg"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
