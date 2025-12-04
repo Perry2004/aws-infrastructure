@@ -16,9 +16,9 @@ resource "aws_security_group" "cca_alb_sg" {
   }
 
   egress {
-    description = "HTTP to UI service"
-    from_port   = var.ui_service_port
-    to_port     = var.ui_service_port
+    description = "HTTP to UI service on dynamic ports"
+    from_port   = 32768
+    to_port     = 61000
     protocol    = "tcp"
     cidr_blocks = [
       aws_subnet.cca_private_a.cidr_block,
@@ -57,8 +57,9 @@ resource "aws_lb" "cca_alb" {
 
 resource "aws_lb_target_group" "cca_tg" {
   name_prefix = "${var.app_short_name}-"
-  port        = var.ui_service_port
   protocol    = "HTTP"
+  target_type = "instance"
+  port        = 3000 # dummy port, actual port is dynamic ephemeral port
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   health_check {
@@ -107,10 +108,10 @@ resource "aws_security_group" "cca_api_alb_sg" {
   }
 
   egress {
-    description = "Allow outbound to private subnets"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "Allow outbound to private subnets ephemeral ports"
+    from_port   = 32768
+    to_port     = 61000
+    protocol    = "tcp"
     cidr_blocks = [
       aws_subnet.cca_private_a.cidr_block,
       aws_subnet.cca_private_b.cidr_block
@@ -148,10 +149,10 @@ resource "aws_lb" "cca_api_alb" {
 }
 
 resource "aws_lb_target_group" "cca_account_tg" {
-  name        = "${var.app_short_name}-account-tg"
-  port        = 6666
+  name_prefix = "${var.app_short_name}-a-"
   protocol    = "HTTP"
   target_type = "instance"
+  port        = 6000 # dummy port, actual port is dynamic ephemeral port
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   health_check {
