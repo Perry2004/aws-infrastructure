@@ -16,6 +16,7 @@ services = [
     memory             = "512"
     desired_count      = 1
     use_load_balancer  = true
+    health_check_path  = "/health"
   },
   {
     service_name       = "api_account-service"
@@ -25,5 +26,6 @@ services = [
     memory             = "512"
     desired_count      = 1
     use_load_balancer  = true
+    health_check_path  = "/api/v1/account/health"
   },
 ]

@@ -49,6 +49,7 @@ variable "services" {
     memory             = string
     desired_count      = number
     use_load_balancer  = optional(bool, false)
+    health_check_path  = optional(string, "")
   }))
   default = []
 }
