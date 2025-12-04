@@ -67,3 +67,9 @@ variable "desired_count" {
   type        = number
   default     = 1
 }
+
+variable "health_check_path" {
+  description = "Path for container health check"
+  type        = string
+  default     = ""
+}
