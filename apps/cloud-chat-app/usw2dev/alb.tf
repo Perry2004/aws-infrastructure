@@ -3,8 +3,8 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 }
 
 resource "aws_security_group" "cca_alb_sg" {
-  name        = "${var.app_short_name}-alb-sg"
-  description = "Security group for Cloud Chat App ALB"
+  name        = "${var.app_short_name}-ui-alb-sg"
+  description = "Security group for Cloud Chat App UI ALB"
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   ingress {
@@ -27,7 +27,7 @@ resource "aws_security_group" "cca_alb_sg" {
   }
 
   tags = {
-    Name = "${var.app_short_name}-alb-sg"
+    Name = "${var.app_short_name}-ui-alb-sg"
   }
 }
 
@@ -56,7 +56,7 @@ resource "aws_lb" "cca_alb" {
 }
 
 resource "aws_lb_target_group" "cca_tg" {
-  name_prefix = "${var.app_short_name}-"
+  name_prefix = "${var.app_short_name}-u-"
   protocol    = "HTTP"
   target_type = "instance"
   port        = 3000 # dummy port, actual port is dynamic ephemeral port
@@ -74,7 +74,7 @@ resource "aws_lb_target_group" "cca_tg" {
   }
 
   tags = {
-    Name = "${var.app_short_name}-tg"
+    Name = "${var.app_short_name}-ui-tg"
   }
 
   lifecycle {
