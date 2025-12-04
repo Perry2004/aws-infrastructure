@@ -2,11 +2,6 @@ resource "aws_ecs_cluster" "cca" {
   name = "${var.app_short_name}-cluster-01"
 }
 
-resource "aws_ecs_account_setting_default" "eni_trunking" {
-  name  = "awsvpcTrunking"
-  value = "enabled"
-}
-
 resource "aws_ecs_cluster_capacity_providers" "cca" {
   cluster_name = aws_ecs_cluster.cca.name
 
@@ -85,17 +80,9 @@ resource "aws_security_group" "ecs_instances" {
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   ingress {
-    description     = "UI service traffic from ALB"
-    from_port       = var.ui_service_port
-    to_port         = var.ui_service_port
-    protocol        = "tcp"
-    security_groups = [aws_security_group.cca_alb_sg.id]
-  }
-
-  ingress {
-    description     = "Account service traffic from internal API ALB"
-    from_port       = 6666
-    to_port         = 6666
+    description     = "Allow inbound from ALB on ephemeral ports"
+    from_port       = 32768
+    to_port         = 61000
     protocol        = "tcp"
     security_groups = [aws_security_group.cca_api_alb_sg.id]
   }
