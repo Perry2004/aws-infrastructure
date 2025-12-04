@@ -2,6 +2,11 @@ resource "aws_ecs_cluster" "cca" {
   name = "${var.app_short_name}-cluster-01"
 }
 
+resource "aws_ecs_account_setting_default" "eni_trunking" {
+  name  = "awsvpcTrunking"
+  value = "enabled"
+}
+
 resource "aws_ecs_cluster_capacity_providers" "cca" {
   cluster_name = aws_ecs_cluster.cca.name
 
