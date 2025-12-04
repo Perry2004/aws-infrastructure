@@ -80,11 +80,19 @@ resource "aws_security_group" "ecs_instances" {
   vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
 
   ingress {
-    description     = "Allow inbound from ALB on ephemeral ports"
+    description     = "Allow inbound from API ALB on ephemeral ports"
     from_port       = 32768
     to_port         = 61000
     protocol        = "tcp"
     security_groups = [aws_security_group.cca_api_alb_sg.id]
+  }
+
+  ingress {
+    description     = "Allow inbound from UI ALB on ephemeral ports"
+    from_port       = 32768
+    to_port         = 61000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.cca_alb_sg.id]
   }
 
   egress {
