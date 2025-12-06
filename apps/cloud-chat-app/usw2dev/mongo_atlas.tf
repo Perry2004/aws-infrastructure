@@ -12,7 +12,7 @@ resource "mongodbatlas_advanced_cluster" "cca-mongo" {
     {
       region_configs = [
         {
-          region_name           = upper(var.aws_region)
+          region_name           = replace(upper(var.aws_region), "-", "_")
           priority              = 7
           provider_name         = "tenant"
           backing_provider_name = "AWS"
