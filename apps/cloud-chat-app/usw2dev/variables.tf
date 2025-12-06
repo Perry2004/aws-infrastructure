@@ -107,3 +107,18 @@ variable "cloudfront_access_logs_bucket_prefix" {
   type        = string
   default     = "cloudfront-logs"
 }
+
+variable "TFC_MONGO_ATLAS_CLIENT_ID" {
+  description = "Terraform Cloud variable for MongoDB Atlas Client ID"
+  type        = string
+}
+
+variable "TFC_MONGO_ATLAS_CLIENT_SECRET" {
+  description = "Terraform Cloud variable for MongoDB Atlas Client Secret"
+  type        = string
+}
+
+variable "TFC_MONGO_ATLAS_ORG_ID" {
+  description = "Terraform Cloud variable for MongoDB Atlas Organization ID"
+  type        = string
+}
