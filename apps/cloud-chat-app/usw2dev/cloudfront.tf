@@ -16,6 +16,7 @@ resource "aws_cloudfront_distribution" "cca_distribution" {
   default_root_object = ""
   aliases             = ["${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}"]
 
+
   # Origin 1: ALB for SSR pages and assets
   origin {
     domain_name = aws_lb.cca_alb.dns_name
@@ -161,5 +162,42 @@ resource "aws_cloudfront_origin_request_policy" "api_gateway_no_host" {
 
   query_strings_config {
     query_string_behavior = "all"
+  }
+}
+
+# CloudFront V2 Logging Resources
+resource "aws_cloudwatch_log_delivery_source" "cca_cloudfront_logs" {
+  count = var.enable_cloudfront_access_logs ? 1 : 0
+
+  region = "us-east-1"
+
+  name         = "${var.app_short_name}-cloudfront-logs"
+  log_type     = "ACCESS_LOGS"
+  resource_arn = aws_cloudfront_distribution.cca_distribution.arn
+}
+
+resource "aws_cloudwatch_log_delivery_destination" "cca_cloudfront_logs" {
+  count = var.enable_cloudfront_access_logs ? 1 : 0
+
+  region = "us-east-1"
+
+  name          = "${var.app_short_name}-cloudfront-s3-destination"
+  output_format = "parquet"
+
+  delivery_destination_configuration {
+    destination_resource_arn = var.cloudfront_access_logs_bucket_name != "" ? "arn:aws:s3:::${var.cloudfront_access_logs_bucket_name}/${var.cloudfront_access_logs_bucket_prefix}" : "${aws_s3_bucket.cca_cloudfront_logs[0].arn}/${var.cloudfront_access_logs_bucket_prefix}"
+  }
+}
+
+resource "aws_cloudwatch_log_delivery" "cca_cloudfront_logs" {
+  count = var.enable_cloudfront_access_logs ? 1 : 0
+
+  region = "us-east-1"
+
+  delivery_source_name     = aws_cloudwatch_log_delivery_source.cca_cloudfront_logs[0].name
+  delivery_destination_arn = aws_cloudwatch_log_delivery_destination.cca_cloudfront_logs[0].arn
+
+  s3_delivery_configuration {
+    suffix_path = "/${data.aws_caller_identity.current.account_id}/{DistributionId}/{yyyy}/{MM}/{dd}/{HH}"
   }
 }

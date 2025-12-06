@@ -63,28 +63,28 @@ resource "aws_cloudwatch_log_group" "apigw_access_logs" {
 resource "aws_cloudwatch_log_resource_policy" "apigw_logs_policy" {
   count = var.enable_apigw_access_logs ? 1 : 0
 
-  policy_name     = "${var.app_short_name}-${var.env_name}-apigw-logs-policy"
-  policy_document = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
+  policy_name = "${var.app_short_name}-${var.env_name}-apigw-logs-policy"
+  policy_document = jsonencode(
     {
-      "Sid": "AllowAPIGatewayCloudWatchLogs",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "apigateway.amazonaws.com"
-      },
-      "Action": [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:CreateLogGroup",
-        "logs:DescribeLogStreams"
-      ],
-      "Resource": "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.apigw_access_logs[0].name}:*"
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Sid" : "AllowAPIGatewayCloudWatchLogs",
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "apigateway.amazonaws.com"
+          },
+          "Action" : [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:CreateLogGroup",
+            "logs:DescribeLogStreams"
+          ],
+          "Resource" : "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.apigw_access_logs[0].name}:*"
+        }
+      ]
     }
-  ]
-}
-POLICY
+  )
 }
 
 # integration for account service
