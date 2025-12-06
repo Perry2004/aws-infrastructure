@@ -92,6 +92,24 @@ resource "aws_s3_bucket_policy" "cca_cloudfront_logs_policy" {
         }
       },
       {
+        Sid    = "AWSLogDeliveryWrite1"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "arn:aws:s3:::${local.cloudfront_logs_bucket}/${local.cloudfront_log_prefix}*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "s3:x-amz-acl"      = "bucket-owner-full-control"
+          }
+          ArnLike = {
+            "aws:SourceArn" = "arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:delivery-source:cca-cloudfront-logs"
+          }
+        }
+      },
+      {
         Sid    = "AWSLogDeliveryAclCheck"
         Effect = "Allow"
         Principal = {
