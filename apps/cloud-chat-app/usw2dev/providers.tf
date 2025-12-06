@@ -7,3 +7,8 @@ provider "aws" {
     }
   }
 }
+
+provider "mongodbatlas" {
+  client_id     = var.TFC_MONGO_ATLAS_CLIENT_ID
+  client_secret = var.TFC_MONGO_ATLAS_CLIENT_SECRET
+}
