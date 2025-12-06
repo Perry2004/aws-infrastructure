@@ -60,11 +60,12 @@ resource "aws_lb" "cca_alb" {
 }
 
 resource "aws_lb_target_group" "cca_tg" {
-  name_prefix = "${var.app_short_name}-u-"
-  protocol    = "HTTP"
-  target_type = "instance"
-  port        = 3000 # dummy port, actual port is dynamic ephemeral port
-  vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
+  name_prefix          = "${var.app_short_name}-u-"
+  protocol             = "HTTP"
+  target_type          = "instance"
+  port                 = 3000 # dummy port, actual port is dynamic ephemeral port
+  vpc_id               = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
+  deregistration_delay = 30
 
   health_check {
     enabled             = true
@@ -157,11 +158,12 @@ resource "aws_lb" "cca_api_alb" {
 }
 
 resource "aws_lb_target_group" "cca_account_tg" {
-  name_prefix = "${var.app_short_name}-a-"
-  protocol    = "HTTP"
-  target_type = "instance"
-  port        = 6000 # dummy port, actual port is dynamic ephemeral port
-  vpc_id      = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
+  name_prefix          = "${var.app_short_name}-a-"
+  protocol             = "HTTP"
+  target_type          = "instance"
+  port                 = 6000 # dummy port, actual port is dynamic ephemeral port
+  vpc_id               = data.terraform_remote_state.vpc.outputs.usw2dev_vpc_id
+  deregistration_delay = 30
 
   health_check {
     enabled             = true
