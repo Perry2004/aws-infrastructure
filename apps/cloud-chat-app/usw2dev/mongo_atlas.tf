@@ -24,3 +24,9 @@ resource "mongodbatlas_advanced_cluster" "cca-mongo" {
     }
   ]
 }
+
+resource "mongodbatlas_project_ip_access_list" "cca-mongo" {
+  project_id = mongodbatlas_project.cca-mongo.id
+  cidr_block = "0.0.0.0/0"
+  comment    = "Allow access from anywhere"
+}
