@@ -89,3 +89,21 @@ variable "apigw_access_log_retention_days" {
   type        = number
   default     = 30
 }
+
+variable "enable_cloudfront_access_logs" {
+  description = "Enable CloudFront access logs to S3"
+  type        = bool
+  default     = true
+}
+
+variable "cloudfront_access_logs_bucket_name" {
+  description = "Optional pre-existing S3 bucket to use for CloudFront access logs. If empty, a new bucket will be created."
+  type        = string
+  default     = ""
+}
+
+variable "cloudfront_access_logs_bucket_prefix" {
+  description = "Prefix to use for CloudFront logs inside the S3 bucket."
+  type        = string
+  default     = "cloudfront-logs"
+}
