@@ -18,7 +18,6 @@ resource "mongodbatlas_advanced_cluster" "cca-mongo" {
           backing_provider_name = "AWS"
           electable_specs = {
             instance_size = "M0"
-            node_count    = 3
           }
         }
       ]
