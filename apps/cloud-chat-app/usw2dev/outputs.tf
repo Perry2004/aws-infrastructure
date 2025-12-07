@@ -3,6 +3,11 @@ output "ses_domain_identity_arn" {
   value       = aws_ses_domain_identity.chat_domain.arn
 }
 
+output "ses_email_identity_arn" {
+  description = "ARN of the SES email identity"
+  value       = aws_ses_email_identity.do_not_reply.arn
+}
+
 output "ses_domain_identity_verification_token" {
   description = "Verification token for the SES domain identity"
   value       = aws_ses_domain_identity.chat_domain.verification_token
@@ -268,4 +273,9 @@ output "alb_logs_bucket_name" {
 output "alb_logs_bucket_arn" {
   description = "S3 bucket ARN used for ALB access logs"
   value       = var.alb_access_logs_bucket_name != "" ? "arn:aws:s3:::${var.alb_access_logs_bucket_name}" : (length(aws_s3_bucket.cca_alb_logs) > 0 ? aws_s3_bucket.cca_alb_logs[0].arn : "")
+}
+
+output "cognito_user_pool_id" {
+  description = "ID of the Cognito User Pool"
+  value       = aws_cognito_user_pool.cca.id
 }
