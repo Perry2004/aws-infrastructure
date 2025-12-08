@@ -17,6 +17,9 @@ services = [
     desired_count      = 1
     use_load_balancer  = true
     health_check_path  = "/health"
+    env_vars = {
+      "dummy" = "value"
+    }
   },
   {
     service_name       = "api_account-service"
@@ -27,5 +30,12 @@ services = [
     desired_count      = 1
     use_load_balancer  = true
     health_check_path  = "/api/v1/account/health"
+    env_vars = {
+      "dummy" = "value"
+    }
   },
+]
+
+cca_secrets = [
+  "mongo_client_id"
 ]

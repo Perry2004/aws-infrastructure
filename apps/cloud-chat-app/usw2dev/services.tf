@@ -23,4 +23,17 @@ module "services" {
   target_group_arn       = each.value.use_load_balancer ? lookup(local.service_target_group_arns, each.value.service_name, aws_lb_target_group.cca_tg.arn) : null
   desired_count          = each.value.desired_count
   health_check_path      = each.value.health_check_path
+  env_vars               = each.value.env_vars
+  secrets                = var.cca_secrets
+}
+
+resource "aws_ssm_parameter" "cca_secrets" {
+  for_each = toset(var.cca_secrets)
+  name     = "/${var.app_short_name}/${each.value}"
+  type     = "SecureString"
+  value    = "DUMMY_VALUE_MANAGED_IN_TERRAFORM"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }

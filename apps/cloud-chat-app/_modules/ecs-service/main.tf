@@ -44,13 +44,30 @@ resource "aws_ecs_task_definition" "service" {
           awslogs-stream-prefix = "ecs"
         }
       }
+      environment = [for key, value in var.env_vars : {
+        name  = key
+        value = value
+      }]
+      # secrets = [for secret_name in var.secrets : {
+      #   name      = replace(secret_name, "/${var.app_short_name}/", "")
+      #   valueFrom = data.aws_ssm_parameter.secrets[secret_name].arn
+      # }]
     }
   ])
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   tags = {
     Name = "${var.app_short_name}-${var.service_name}-task"
   }
 }
+
+# data "aws_ssm_parameter" "secrets" {
+#   for_each = toset(var.secrets)
+#   name     = "/${var.app_short_name}/${each.value}"
+# }
 
 resource "aws_ecs_service" "service" {
   name                               = "${var.app_short_name}-${var.service_name}-svc"

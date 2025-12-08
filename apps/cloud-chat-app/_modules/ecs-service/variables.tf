@@ -73,3 +73,15 @@ variable "health_check_path" {
   type        = string
   default     = ""
 }
+
+variable "env_vars" {
+  description = "Map of environment variables for the container"
+  type        = map(string)
+  default     = {}
+}
+
+variable "secrets" {
+  description = "List of secret names to be fetched from SSM Parameter Store"
+  type        = list(string)
+  default     = []
+}
