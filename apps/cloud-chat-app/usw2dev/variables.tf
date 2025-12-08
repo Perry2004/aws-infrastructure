@@ -50,6 +50,7 @@ variable "services" {
     desired_count      = number
     use_load_balancer  = optional(bool, false)
     health_check_path  = optional(string, "")
+    env_vars           = optional(map(string), {})
   }))
   default = []
 }
@@ -121,4 +122,9 @@ variable "TFC_MONGO_ATLAS_CLIENT_SECRET" {
 variable "TFC_MONGO_ATLAS_ORG_ID" {
   description = "Terraform Cloud variable for MongoDB Atlas Organization ID"
   type        = string
+}
+
+variable "cca_secrets" {
+  description = "Secrets as SSM parameters"
+  type        = list(string)
 }
