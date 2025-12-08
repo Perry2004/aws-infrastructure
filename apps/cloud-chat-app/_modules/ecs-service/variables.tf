@@ -50,6 +50,11 @@ variable "execution_role_arn" {
   type        = string
 }
 
+variable "task_role_arn" {
+  description = "ARN of the ECS task role"
+  type        = string
+}
+
 variable "target_group_arn" {
   description = "ARN of the ALB target group"
   type        = string
