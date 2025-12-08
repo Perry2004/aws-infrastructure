@@ -48,10 +48,10 @@ resource "aws_ecs_task_definition" "service" {
         name  = key
         value = value
       }]
-      # secrets = [for secret_name in var.secrets : {
-      #   name      = replace(secret_name, "/${var.app_short_name}/", "")
-      #   valueFrom = data.aws_ssm_parameter.secrets[secret_name].arn
-      # }]
+      secrets = [for secret_name, secret_arn in var.secrets_arns : {
+        name      = secret_name
+        valueFrom = secret_arn
+      }]
     }
   ])
 
@@ -63,11 +63,6 @@ resource "aws_ecs_task_definition" "service" {
     Name = "${var.app_short_name}-${var.service_name}-task"
   }
 }
-
-# data "aws_ssm_parameter" "secrets" {
-#   for_each = toset(var.secrets)
-#   name     = "/${var.app_short_name}/${each.value}"
-# }
 
 resource "aws_ecs_service" "service" {
   name                               = "${var.app_short_name}-${var.service_name}-svc"
@@ -96,6 +91,8 @@ resource "aws_ecs_service" "service" {
     type  = "binpack"
     field = "cpu"
   }
+
+  enable_execute_command = true
 
   lifecycle {
     ignore_changes = [desired_count]

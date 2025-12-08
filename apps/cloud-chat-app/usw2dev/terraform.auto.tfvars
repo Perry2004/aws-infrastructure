@@ -37,5 +37,6 @@ services = [
 ]
 
 cca_secrets = [
-  "mongo_client_id"
+  "mongo_client_id",
+  "mongo_client"
 ]
