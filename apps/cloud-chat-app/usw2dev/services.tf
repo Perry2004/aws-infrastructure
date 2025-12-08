@@ -25,6 +25,7 @@ module "services" {
   cpu                    = each.value.cpu
   memory                 = each.value.memory
   execution_role_arn     = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn          = aws_iam_role.ecs_task_role.arn
   target_group_arn       = each.value.use_load_balancer ? lookup(local.service_target_group_arns, each.value.service_name, aws_lb_target_group.cca_tg.arn) : null
   desired_count          = each.value.desired_count
   health_check_path      = each.value.health_check_path
