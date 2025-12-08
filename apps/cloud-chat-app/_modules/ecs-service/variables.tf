@@ -80,8 +80,8 @@ variable "env_vars" {
   default     = {}
 }
 
-variable "secrets" {
-  description = "List of secret names to be fetched from SSM Parameter Store"
-  type        = list(string)
-  default     = []
+variable "secrets_arns" {
+  description = "Map of secret arns that will be injected into the container"
+  type        = map(string)
+  default     = {}
 }

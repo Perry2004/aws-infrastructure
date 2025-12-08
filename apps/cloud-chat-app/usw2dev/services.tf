@@ -1,7 +1,12 @@
+
 locals {
   service_target_group_arns = {
     "ui"                  = aws_lb_target_group.cca_tg.arn
     "api_account-service" = aws_lb_target_group.cca_account_tg.arn
+  }
+  secrets_arns = {
+    for secret_name in var.cca_secrets :
+    secret_name => aws_ssm_parameter.cca_secrets[secret_name].arn
   }
 }
 
@@ -24,7 +29,7 @@ module "services" {
   desired_count          = each.value.desired_count
   health_check_path      = each.value.health_check_path
   env_vars               = each.value.env_vars
-  secrets                = var.cca_secrets
+  secrets_arns           = local.secrets_arns
 }
 
 resource "aws_ssm_parameter" "cca_secrets" {
