@@ -57,10 +57,6 @@ resource "aws_iam_policy" "cca_gha_policy" {
       }
     ]
   })
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "github_actions_role_policy_attachment" {
@@ -93,7 +89,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
 }
 
 resource "aws_iam_policy" "ecs_task_policy" {
-  name        = "${var.app_short_name}-ecs-task-policy"
+  name_prefix = "${var.app_short_name}-ecs-task-policy"
   description = "Runtime policy for ECS tasks in ${var.app_short_name}"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -115,7 +111,7 @@ resource "aws_iam_policy" "ecs_task_policy" {
 }
 
 resource "aws_iam_policy" "ecs_exec_policy" {
-  name        = "${var.app_short_name}-ecs-exec-policy"
+  name_prefix = "${var.app_short_name}-ecs-exec-policy"
   description = "Policy to allow ECS Exec functionality for ${var.app_short_name}"
   policy = jsonencode({
     Version = "2012-10-17"
