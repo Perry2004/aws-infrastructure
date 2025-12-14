@@ -274,13 +274,3 @@ output "alb_logs_bucket_arn" {
   description = "S3 bucket ARN used for ALB access logs"
   value       = var.alb_access_logs_bucket_name != "" ? "arn:aws:s3:::${var.alb_access_logs_bucket_name}" : (length(aws_s3_bucket.cca_alb_logs) > 0 ? aws_s3_bucket.cca_alb_logs[0].arn : "")
 }
-
-output "cognito_user_pool_id" {
-  description = "ID of the Cognito User Pool"
-  value       = aws_cognito_user_pool.cca.id
-}
-
-output "cognito_app_client_id" {
-  description = "ID of the Cognito User Pool Client"
-  value       = aws_cognito_user_pool_client.cca_client.id
-}
