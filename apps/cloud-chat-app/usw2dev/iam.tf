@@ -68,6 +68,7 @@ resource "aws_iam_role_policy_attachment" "github_actions_role_policy_attachment
   policy_arn = aws_iam_policy.cca_gha_policy.arn
 }
 
+# role used by ECS to launch and manage tasks
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "${var.app_short_name}-ecs-task-execution-role"
   assume_role_policy = jsonencode({
@@ -91,9 +92,31 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_policy" "ecs_task_policy" {
+  name        = "${var.app_short_name}-ecs-task-policy"
+  description = "Runtime policy for ECS tasks in ${var.app_short_name}"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/${var.app_short_name}/*"
+      },
+    ]
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "aws_iam_policy" "ecs_exec_policy" {
   name        = "${var.app_short_name}-ecs-exec-policy"
-  description = "Policy to enable ECS Exec for ${var.app_short_name}"
+  description = "Policy to allow ECS Exec functionality for ${var.app_short_name}"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -106,14 +129,6 @@ resource "aws_iam_policy" "ecs_exec_policy" {
           "ssmmessages:OpenDataChannel"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/${var.app_short_name}/*"
       },
       {
         Effect = "Allow"
@@ -132,6 +147,12 @@ resource "aws_iam_policy" "ecs_exec_policy" {
   }
 }
 
+resource "aws_iam_role_policy_attachment" "ecs_exec_role_policy_attachment" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_exec_policy.arn
+}
+
+# role used by ECS tasks (runtime role)
 resource "aws_iam_role" "ecs_task_role" {
   name = "${var.app_short_name}-ecs-task-role"
   assume_role_policy = jsonencode({
@@ -152,6 +173,6 @@ resource "aws_iam_role" "ecs_task_role" {
 
 resource "aws_iam_role_policy_attachment" "ecs_task_role_exec_policy" {
   role       = aws_iam_role.ecs_task_role.name
-  policy_arn = aws_iam_policy.ecs_exec_policy.arn
+  policy_arn = aws_iam_policy.ecs_task_policy.arn
 }
 
