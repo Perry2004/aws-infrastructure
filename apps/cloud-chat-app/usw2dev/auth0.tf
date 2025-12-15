@@ -28,12 +28,12 @@ resource "auth0_client" "cca_account_service" {
   ]
 
   allowed_logout_urls = [
-    "http://localhost:6666",
+    "http://localhost:1688",
     "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}/"
   ]
 
   web_origins = [
-    "http://localhost:6666",
+    "http://localhost:1688",
     "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}"
   ]
 
@@ -46,4 +46,16 @@ resource "auth0_client" "cca_account_service" {
     "authorization_code",
     "refresh_token"
   ]
+}
+
+resource "auth0_email_provider" "amazon_ses_email_provider" {
+  name                 = "ses"
+  enabled              = true
+  default_from_address = aws_ses_email_identity.do_not_reply.email
+
+  credentials {
+    access_key_id     = aws_iam_access_key.auth0_ses.id
+    secret_access_key = aws_iam_access_key.auth0_ses.secret
+    region            = aws_ses_email_identity.do_not_reply.region
+  }
 }
