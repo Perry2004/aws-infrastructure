@@ -15,25 +15,25 @@ resource "auth0_resource_server_scopes" "cca_backend_scopes" {
   }
 }
 
-# frontend client
-resource "auth0_client" "cca_frontend" {
-  name            = "${var.app_short_name}-frontend"
-  description     = "CCA Tanstack Start frontend client"
+# account service client
+resource "auth0_client" "cca_account_service" {
+  name            = "${var.app_short_name}-account-service"
+  description     = "CCA account service client"
   app_type        = "regular_web"
   oidc_conformant = true
 
   callbacks = [
-    "http://localhost:1688/api/auth/callback",
-    "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}/api/auth/callback"
+    "http://localhost:1688/api/v1/account/callback",
+    "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}/api/v1/account/callback"
   ]
 
   allowed_logout_urls = [
-    "http://localhost:1688",
+    "http://localhost:6666",
     "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}/"
   ]
 
   web_origins = [
-    "http://localhost:1688",
+    "http://localhost:6666",
     "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}"
   ]
 
