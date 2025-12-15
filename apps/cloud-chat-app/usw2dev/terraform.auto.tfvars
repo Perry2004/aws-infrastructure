@@ -40,3 +40,11 @@ cca_secrets = [
   "mongo_client_id",
   "mongo_client"
 ]
+
+auth0_scopes = [{
+  name        = "dummy:one"
+  description = "dummy scope one"
+  }, {
+  name        = "dummy:two"
+  description = "dummy scope two"
+}]
