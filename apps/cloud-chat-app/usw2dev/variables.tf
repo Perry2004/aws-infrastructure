@@ -128,3 +128,27 @@ variable "cca_secrets" {
   description = "Secrets as SSM parameters"
   type        = list(string)
 }
+
+variable "TFC_AUTH0_CLIENT_ID" {
+  description = "Terraform Cloud variable for Auth0 Client ID"
+  type        = string
+}
+
+variable "TFC_AUTH0_CLIENT_SECRET" {
+  description = "Terraform Cloud variable for Auth0 Client Secret"
+  type        = string
+}
+
+variable "TFC_AUTH0_DOMAIN" {
+  description = "Terraform Cloud variable for Auth0 Domain"
+  type        = string
+}
+
+variable "auth0_scopes" {
+  description = "List of Auth0 resource server scopes"
+  type = list(object({
+    name        = string
+    description = string
+  }))
+  default = []
+}
