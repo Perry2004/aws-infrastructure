@@ -54,3 +54,11 @@ resource "aws_route53_record" "chat_alias_ipv6" {
     evaluate_target_health = false
   }
 }
+
+resource "aws_route53_record" "auth0_custom_domain" {
+  zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
+  name    = "auth.${data.terraform_remote_state.dns.outputs.domain_name}"
+  type    = "CNAME"
+  ttl     = 600
+  records = [auth0_custom_domain.auth_domain.verification[0].methods[0].record]
+}

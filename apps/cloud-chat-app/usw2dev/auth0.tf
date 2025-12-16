@@ -8,10 +8,12 @@ resource "auth0_resource_server" "cca_backend" {
 
 resource "auth0_resource_server_scopes" "cca_backend_scopes" {
   resource_server_identifier = auth0_resource_server.cca_backend.identifier
-  for_each                   = { for scope in var.auth0_scopes : scope.name => scope }
-  scopes {
-    name        = each.value.name
-    description = each.value.description
+  dynamic "scopes" {
+    for_each = var.auth0_scopes
+    content {
+      name        = scopes.value.name
+      description = scopes.value.description
+    }
   }
 }
 
@@ -58,4 +60,18 @@ resource "auth0_email_provider" "amazon_ses_email_provider" {
     secret_access_key = aws_iam_access_key.auth0_ses.secret
     region            = aws_ses_email_identity.do_not_reply.region
   }
+}
+
+resource "auth0_custom_domain" "auth_domain" {
+  domain     = "auth.${data.terraform_remote_state.dns.outputs.domain_name}"
+  type       = "auth0_managed_certs"
+  tls_policy = "recommended"
+}
+
+# verification record in dns.tf
+
+resource "auth0_custom_domain_verification" "auth_domain_verification" {
+  depends_on       = [aws_route53_record.auth0_custom_domain]
+  custom_domain_id = auth0_custom_domain.auth_domain.id
+  timeouts { create = "15m" }
 }
