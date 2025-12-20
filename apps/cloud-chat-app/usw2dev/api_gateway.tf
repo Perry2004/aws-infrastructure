@@ -14,8 +14,8 @@ resource "aws_security_group" "cca_apigw_vpclink_sg" {
 
   egress {
     description = "Allow outbound to account service port"
-    from_port   = 6666
-    to_port     = 6666
+    from_port   = 8666
+    to_port     = 8666
     protocol    = "tcp"
     cidr_blocks = [
       aws_subnet.cca_private_a.cidr_block,

@@ -1,9 +1,9 @@
 # backend resource server
 resource "auth0_resource_server" "cca_backend" {
-  name        = "${var.app_short_name}-backend"
-  identifier  = "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}/api/"
-  signing_alg = "RS256"
-
+  name                 = "${var.app_short_name}-backend"
+  identifier           = "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}/api/"
+  signing_alg          = "RS256"
+  allow_offline_access = true
 }
 
 resource "auth0_resource_server_scopes" "cca_backend_scopes" {
@@ -25,7 +25,7 @@ resource "auth0_client" "cca_account_service" {
   oidc_conformant = true
 
   callbacks = [
-    "http://localhost:1688/api/v1/account/callback",
+    "http://localhost:8666/api/v1/account/callback",
     "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}/api/v1/account/callback"
   ]
 
