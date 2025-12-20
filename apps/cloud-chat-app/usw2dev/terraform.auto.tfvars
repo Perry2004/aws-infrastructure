@@ -24,7 +24,7 @@ services = [
   {
     service_name       = "api_account-service"
     ecr_repository_key = "api/account-service"
-    container_port     = 6666
+    container_port     = 8666
     cpu                = "256"
     memory             = "512"
     desired_count      = 1
