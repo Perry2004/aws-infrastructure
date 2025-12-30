@@ -25,8 +25,8 @@ resource "auth0_client" "cca_account_service" {
   oidc_conformant = true
 
   callbacks = [
-    "http://localhost:8666/api/v1/account/callback",
-    "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}/api/v1/account/callback"
+    "http://localhost:8666/api/v1/account/auth/callback",
+    "https://${var.subdomain_name}.${data.terraform_remote_state.dns.outputs.domain_name}/api/v1/account/auth/callback"
   ]
 
   allowed_logout_urls = [
@@ -46,8 +46,15 @@ resource "auth0_client" "cca_account_service" {
 
   grant_types = [
     "authorization_code",
-    "refresh_token"
+    "refresh_token",
+    "client_credentials"
   ]
+}
+
+resource "auth0_client_grant" "cca_account_service_management_api" {
+  client_id = auth0_client.cca_account_service.id
+  audience  = "https://${var.TFC_AUTH0_DOMAIN}/api/v2/"
+  scopes    = ["read:users", "update:users", "delete:users"]
 }
 
 resource "auth0_email_provider" "amazon_ses_email_provider" {
