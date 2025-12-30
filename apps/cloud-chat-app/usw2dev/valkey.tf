@@ -25,7 +25,7 @@ resource "aws_elasticache_serverless_cache" "valkey" {
       unit    = "GB"
     }
     ecpu_per_second {
-      maximum = 5000
+      maximum = 1000
     }
   }
 }
