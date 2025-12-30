@@ -274,3 +274,13 @@ output "alb_logs_bucket_arn" {
   description = "S3 bucket ARN used for ALB access logs"
   value       = var.alb_access_logs_bucket_name != "" ? "arn:aws:s3:::${var.alb_access_logs_bucket_name}" : (length(aws_s3_bucket.cca_alb_logs) > 0 ? aws_s3_bucket.cca_alb_logs[0].arn : "")
 }
+
+output "valkey_primary_endpoint" {
+  description = "The primary endpoint of the Valkey serverless cache"
+  value       = aws_elasticache_serverless_cache.valkey.endpoint[0].address
+}
+
+output "valkey_port" {
+  description = "The port of the Valkey serverless cache"
+  value       = aws_elasticache_serverless_cache.valkey.endpoint[0].port
+}
