@@ -173,52 +173,52 @@
 # }
 
 # # IAM user dedicated to Auth0 SES integration
-# resource "aws_iam_user" "auth0_ses" {
-#   name = "${var.app_short_name}-auth0-ses"
+resource "aws_iam_user" "auth0_ses" {
+  name = "${var.app_short_name}-auth0-ses"
 
-#   tags = {
-#     Name = "${var.app_short_name}-auth0-ses"
-#   }
-# }
+  tags = {
+    Name = "${var.app_short_name}-auth0-ses"
+  }
+}
 
-# resource "aws_iam_user_policy" "auth0_ses_send_policy" {
-#   name = "${upper(var.app_short_name)}-Auth0-SES-Send"
-#   user = aws_iam_user.auth0_ses.name
+resource "aws_iam_user_policy" "auth0_ses_send_policy" {
+  name = "${upper(var.app_short_name)}-Auth0-SES-Send"
+  user = aws_iam_user.auth0_ses.name
 
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Sid    = "AllowSendEmail"
-#         Effect = "Allow"
-#         Action = [
-#           "ses:SendEmail",
-#           "ses:SendRawEmail"
-#         ]
-#         Resource = [
-#           aws_ses_domain_identity.chat_domain.arn,
-#           aws_ses_email_identity.do_not_reply.arn
-#         ]
-#         Condition = {
-#           StringEquals = {
-#             "ses:FromAddress" = aws_ses_email_identity.do_not_reply.email
-#           }
-#         }
-#       },
-#       {
-#         Sid    = "AllowSendQuotaRead"
-#         Effect = "Allow"
-#         Action = [
-#           "ses:GetSendQuota",
-#           "ses:GetSendStatistics"
-#         ]
-#         Resource = "*"
-#       }
-#     ]
-#   })
-# }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowSendEmail"
+        Effect = "Allow"
+        Action = [
+          "ses:SendEmail",
+          "ses:SendRawEmail"
+        ]
+        Resource = [
+          aws_ses_domain_identity.chat_domain.arn,
+          aws_ses_email_identity.do_not_reply.arn
+        ]
+        Condition = {
+          StringEquals = {
+            "ses:FromAddress" = aws_ses_email_identity.do_not_reply.email
+          }
+        }
+      },
+      {
+        Sid    = "AllowSendQuotaRead"
+        Effect = "Allow"
+        Action = [
+          "ses:GetSendQuota",
+          "ses:GetSendStatistics"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
 
-# resource "aws_iam_access_key" "auth0_ses" {
-#   user = aws_iam_user.auth0_ses.name
-# }
+resource "aws_iam_access_key" "auth0_ses" {
+  user = aws_iam_user.auth0_ses.name
+}
 
