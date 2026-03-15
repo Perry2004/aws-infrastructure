@@ -18,3 +18,8 @@ workspaces:
     working_directory: "apps/cloud-chat-app/usw2dev"
     trigger_patterns:
       - "apps/cloud-chat-app/_modules/**"
+  - name: "gp-news-usw2dev"
+    description: "Workspace for the infrastructure of the GP-News app in usw2dev"
+    working_directory: "apps/gp-news/usw2dev"
+    trigger_patterns:
+      - "apps/gp-news/_modules/**"
