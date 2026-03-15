@@ -13,6 +13,25 @@ resource "aws_lambda_function" "gp_news_lambda" {
   timeout     = 60
 
   architectures = ["x86_64"]
+
+  environment {
+    variables = merge(
+      var.lambda_environment_variables,
+      { for k, v in var.ssm_parameters : k => aws_ssm_parameter.lambda_params[k].value }
+    )
+  }
+}
+
+resource "aws_ssm_parameter" "lambda_params" {
+  for_each = var.ssm_parameters
+
+  name  = each.value
+  type  = "SecureString"
+  value = "dummy-value"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_cloudwatch_event_rule" "gp_news_periodic" {
