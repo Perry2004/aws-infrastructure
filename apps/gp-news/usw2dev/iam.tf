@@ -1,5 +1,5 @@
 resource "aws_iam_role" "gp_news_gha_ecr" {
-  name = "PWP-GHA-S3-ECR-ReadWrite"
+  name = "GP-News-GHA-ECR-ReadWrite"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -99,7 +99,7 @@ resource "aws_iam_policy" "gp_news_lambda_custom" {
         "ses:SendRawEmail"
       ]
       Resource = [
-        aws_ses_domain_identity.gp_news_domain,
+        aws_ses_domain_identity.gp_news_domain.arn,
         aws_ses_email_identity.do_not_reply.arn
       ]
       Condition = {
