@@ -26,3 +26,9 @@ variable "num_versions_to_keep" {
   type        = number
   default     = 3
 }
+
+variable "schedule_daily_utc_time" {
+  description = "The UTC time to schedule the daily scraper (in HH:MM format)"
+  type        = list(string)
+  default     = ["00:00"]
+}
