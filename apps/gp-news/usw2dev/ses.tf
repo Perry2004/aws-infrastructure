@@ -1,4 +1,3 @@
-
 resource "aws_route53_record" "ses_verification" {
   zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
   name    = "_amazonses.${aws_ses_domain_identity.gp_news_domain.domain}"
