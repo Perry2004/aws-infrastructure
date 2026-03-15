@@ -14,3 +14,15 @@ variable "app_name" {
   type        = string
   default     = "gp-news"
 }
+
+variable "data_retention_days" {
+  description = "Number of days to retain data"
+  type        = number
+  default     = 90
+}
+
+variable "num_versions_to_keep" {
+  description = "Number of versions to keep"
+  type        = number
+  default     = 3
+}
