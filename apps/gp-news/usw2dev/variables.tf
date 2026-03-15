@@ -32,3 +32,15 @@ variable "schedule_daily_utc_time" {
   type        = list(string)
   default     = ["00:00"]
 }
+
+variable "lambda_environment_variables" {
+  description = "A map of environment variables for the Lambda function"
+  type        = map(string)
+  default     = {}
+}
+
+variable "ssm_parameters" {
+  description = "A map of SSM parameter environment variable names to their SSM paths"
+  type        = map(string)
+  default     = {}
+}
