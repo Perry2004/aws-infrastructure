@@ -35,9 +35,9 @@ resource "aws_route53_record" "clawbench_spf" {
 # Ownership TXT Record
 resource "aws_route53_record" "clawbench_ownership" {
   zone_id = aws_route53_zone.clawbench_subzone.zone_id
-  name    = ""
+  name    = "clawbench.${var.domain_name}"
   type    = "TXT"
-  ttl     = "3600"
+  ttl     = "300"
   records = [
     "purelymail_ownership_proof=05ebc6732a9fdf83aaac36fac2bfc3df55b2c5c3a698f16e89086d610c7265e2777f2982e1646833e0eca00f6835ad74dc00b98fde13c4b6e7ab16d4c29032aa"
   ]
@@ -46,7 +46,7 @@ resource "aws_route53_record" "clawbench_ownership" {
 # DKIM Records
 resource "aws_route53_record" "clawbench_dkim_1" {
   zone_id = aws_route53_zone.clawbench_subzone.zone_id
-  name    = "purelymail1._domainkey"
+  name    = "purelymail1._domainkey.clawbench.${var.domain_name}"
   type    = "CNAME"
   ttl     = "3600"
   records = ["key1.dkimroot.purelymail.com."]
@@ -54,7 +54,7 @@ resource "aws_route53_record" "clawbench_dkim_1" {
 
 resource "aws_route53_record" "clawbench_dkim_2" {
   zone_id = aws_route53_zone.clawbench_subzone.zone_id
-  name    = "purelymail2._domainkey"
+  name    = "purelymail2._domainkey.clawbench.${var.domain_name}"
   type    = "CNAME"
   ttl     = "3600"
   records = ["key2.dkimroot.purelymail.com."]
@@ -62,7 +62,7 @@ resource "aws_route53_record" "clawbench_dkim_2" {
 
 resource "aws_route53_record" "clawbench_dkim_3" {
   zone_id = aws_route53_zone.clawbench_subzone.zone_id
-  name    = "purelymail3._domainkey"
+  name    = "purelymail3._domainkey.clawbench.${var.domain_name}"
   type    = "CNAME"
   ttl     = "3600"
   records = ["key3.dkimroot.purelymail.com."]
@@ -71,7 +71,7 @@ resource "aws_route53_record" "clawbench_dkim_3" {
 # DMARC Record
 resource "aws_route53_record" "clawbench_dmarc" {
   zone_id = aws_route53_zone.clawbench_subzone.zone_id
-  name    = "_dmarc"
+  name    = "_dmarc.clawbench.${var.domain_name}"
   type    = "CNAME"
   ttl     = "3600"
   records = [
