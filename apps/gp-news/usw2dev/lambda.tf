@@ -10,7 +10,7 @@ resource "aws_lambda_function" "gp_news_lambda" {
   image_uri     = "${aws_ecr_repository.lambda_container_repo.repository_url}:latest"
 
   memory_size = 512
-  timeout     = 60
+  timeout     = 180
 
   architectures = ["x86_64"]
 
