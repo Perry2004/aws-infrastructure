@@ -1,7 +1,11 @@
+locals {
+  rb_website_domain_name = "${var.subdomain}.${data.terraform_remote_state.dns.outputs.domain_name}"
+}
+
 # DNS alias record to route domain to CloudFront distribution
 resource "aws_route53_record" "rb_website_alias" {
   zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
-  name    = "${var.subdomain}.${data.terraform_remote_state.dns.outputs.domain_name}"
+  name    = local.rb_website_domain_name
   type    = "A"
 
   alias {
@@ -14,7 +18,7 @@ resource "aws_route53_record" "rb_website_alias" {
 # IPv6 AAAA record
 resource "aws_route53_record" "rb_website_alias_ipv6" {
   zone_id = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
-  name    = "${var.subdomain}.${data.terraform_remote_state.dns.outputs.domain_name}"
+  name    = local.rb_website_domain_name
   type    = "AAAA"
 
   alias {
@@ -50,6 +54,43 @@ resource "aws_route53_record" "rb_website_alias_ipv6" {
 #   }
 # }
 
+resource "aws_acm_certificate" "rb_website" {
+  provider          = aws.us-east-1
+  domain_name       = local.rb_website_domain_name
+  validation_method = "DNS"
+
+  tags = {
+    Name = "rbWebsite-Certificate-${var.env_name}"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "rb_website_cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.rb_website.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.terraform_remote_state.dns.outputs.domain_hosted_zone_id
+}
+
+resource "aws_acm_certificate_validation" "rb_website" {
+  provider                = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.rb_website.arn
+  validation_record_fqdns = [for record in aws_route53_record.rb_website_cert_validation : record.fqdn]
+}
+
 # Origin Access Control to allow CloudFront to access private S3 bucket
 resource "aws_cloudfront_origin_access_control" "rb_website_oac" {
   name                              = "rbWebsiteOAC"
@@ -68,7 +109,7 @@ resource "aws_cloudfront_distribution" "rb_website" {
   is_ipv6_enabled     = true
   comment             = "rb website distribution"
   default_root_object = "index.html"
-  aliases             = [data.terraform_remote_state.dns.outputs.domain_name, "${var.subdomain}.${data.terraform_remote_state.dns.outputs.domain_name}"]
+  aliases             = [local.rb_website_domain_name]
 
   origin {
     domain_name              = aws_s3_bucket.rb_website_bucket.bucket_regional_domain_name
@@ -93,7 +134,7 @@ resource "aws_cloudfront_distribution" "rb_website" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = data.terraform_remote_state.dns.outputs.wildcard_certificate_arn_us_east_1
+    acm_certificate_arn      = aws_acm_certificate_validation.rb_website.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }

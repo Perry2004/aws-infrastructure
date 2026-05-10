@@ -29,18 +29,18 @@ output "cloudfront_domain_name" {
 }
 
 output "acm_certificate_arn" {
-  description = "ARN of the ACM certificate for the custom domain (shared wildcard cert - us-east-1)"
-  value       = data.terraform_remote_state.dns.outputs.wildcard_certificate_arn_us_east_1
+  description = "ARN of the ACM certificate for the RailGunBreaker custom domain in us-east-1"
+  value       = aws_acm_certificate_validation.rb_website.certificate_arn
 }
 
 output "acm_certificate_domain_name" {
-  description = "Domain name covered by the ACM certificate (shared wildcard cert)"
-  value       = data.terraform_remote_state.dns.outputs.wildcard_certificate_domain
+  description = "Domain name covered by the RailGunBreaker ACM certificate"
+  value       = aws_acm_certificate.rb_website.domain_name
 }
 
 output "acm_certificate_subject_alternative_names" {
-  description = "Subject alternative names covered by the ACM certificate (shared wildcard cert)"
-  value       = [data.terraform_remote_state.dns.outputs.wildcard_certificate_domain]
+  description = "Subject alternative names covered by the RailGunBreaker ACM certificate"
+  value       = aws_acm_certificate.rb_website.subject_alternative_names
 }
 
 # output "lambda_ecr_repository_url" {
