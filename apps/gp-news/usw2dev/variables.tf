@@ -44,3 +44,8 @@ variable "ssm_parameters" {
   type        = map(string)
   default     = {}
 }
+
+variable "lambda_timeout_seconds" {
+  description = "The timeout for the Lambda function in seconds"
+  type        = number
+}

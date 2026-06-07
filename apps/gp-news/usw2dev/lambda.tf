@@ -25,7 +25,7 @@ resource "aws_lambda_function" "gp_news_lambda" {
 resource "aws_ssm_parameter" "lambda_params" {
   for_each = var.ssm_parameters
 
-  name  = each.value
+  name  = "/${var.app_name}/${var.env_name}/${each.value}"
   type  = "SecureString"
   value = "dummy-value"
 
