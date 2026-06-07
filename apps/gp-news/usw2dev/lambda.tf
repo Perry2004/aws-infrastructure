@@ -10,7 +10,7 @@ resource "aws_lambda_function" "gp_news_lambda" {
   image_uri     = var.lambda_image_uri
 
   memory_size = 512
-  timeout     = 180
+  timeout     = var.lambda_timeout_seconds
 
   architectures = ["x86_64"]
 
