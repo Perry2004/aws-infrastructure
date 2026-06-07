@@ -7,7 +7,7 @@ resource "aws_lambda_function" "gp_news_lambda" {
   function_name = "gp-news-lambda"
   role          = aws_iam_role.gp_news_lambda_exec.arn
   package_type  = "Image"
-  image_uri     = "${aws_ecr_repository.lambda_container_repo.repository_url}:latest"
+  image_uri     = var.lambda_image_uri
 
   memory_size = 512
   timeout     = 180
@@ -59,4 +59,3 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.gp_news_periodic[count.index].arn
 }
-

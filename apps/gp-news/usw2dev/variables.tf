@@ -39,6 +39,11 @@ variable "lambda_environment_variables" {
   default     = {}
 }
 
+variable "lambda_image_uri" {
+  description = "The full ECR image URI for the Lambda container image. This will be set by the deployment GHA as a workspace variable."
+  type        = string
+}
+
 variable "ssm_parameters" {
   description = "A map of SSM parameter environment variable names to their SSM paths"
   type        = map(string)
