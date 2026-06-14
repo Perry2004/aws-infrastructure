@@ -126,6 +126,19 @@ resource "aws_iam_policy" "gp_news_lambda_custom" {
           "ssm:GetParameterHistory"
         ]
         Resource = [for p in aws_ssm_parameter.lambda_params : p.arn]
+      },
+      {
+        Sid    = "AllowBriefingHistoryDynamoDB"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:BatchWriteItem",
+          "dynamodb:DescribeTable",
+          "dynamodb:PutItem",
+          "dynamodb:Query"
+        ]
+        Resource = [
+          aws_dynamodb_table.briefing_history.arn
+        ]
       }
     ]
   })
