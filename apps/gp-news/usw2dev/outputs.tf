@@ -18,8 +18,17 @@ output "lambda_function_name" {
   value       = aws_lambda_function.gp_news_lambda.function_name
 }
 
+output "briefing_history_table_arn" {
+  description = "The ARN of the DynamoDB table storing selected briefing news history"
+  value       = aws_dynamodb_table.briefing_history.arn
+}
+
+output "briefing_history_table_name" {
+  description = "The name of the DynamoDB table storing selected briefing news history"
+  value       = aws_dynamodb_table.briefing_history.name
+}
+
 output "gha_role_arn" {
   description = "The ARN of the IAM role for GitHub Actions"
   value       = aws_iam_role.gp_news_gha_ecr.arn
 }
-
