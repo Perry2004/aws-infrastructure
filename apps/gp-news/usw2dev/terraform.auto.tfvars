@@ -7,14 +7,13 @@ lambda_environment_variables = {
 }
 
 ssm_parameters = {
-  "NEWS_DATA_API_KEY"      = "news_data_api_key"
-  "BASE_URL"               = "base_url"
-  "MODEL"                  = "model"
-  "LLM_API_KEY"            = "llm_api_key"
-  "LLM_PROVIDER_IGNORE"    = "llm_provider_ignore"
-  "EMAIL_FROM"             = "email_from"
-  "EMAIL_TO"               = "email_to"
-  "BRIEFING_HISTORY_TABLE" = "gp-news-usw2dev-briefing-history"
+  "NEWS_DATA_API_KEY"   = "news_data_api_key"
+  "BASE_URL"            = "base_url"
+  "MODEL"               = "model"
+  "LLM_API_KEY"         = "llm_api_key"
+  "LLM_PROVIDER_IGNORE" = "llm_provider_ignore"
+  "EMAIL_FROM"          = "email_from"
+  "EMAIL_TO"            = "email_to"
 }
 
 lambda_timeout_seconds = 900 # 15 minutes

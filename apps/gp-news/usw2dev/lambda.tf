@@ -17,7 +17,10 @@ resource "aws_lambda_function" "gp_news_lambda" {
   environment {
     variables = merge(
       var.lambda_environment_variables,
-      { for k, v in var.ssm_parameters : k => aws_ssm_parameter.lambda_params[k].value }
+      { for k, v in var.ssm_parameters : k => aws_ssm_parameter.lambda_params[k].value },
+      {
+        BRIEFING_HISTORY_TABLE = aws_dynamodb_table.briefing_history.name
+      }
     )
   }
 }
