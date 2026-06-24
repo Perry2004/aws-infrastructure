@@ -90,6 +90,14 @@ resource "aws_iam_policy" "pwp_gha" {
           "ecr:UploadLayerPart"
         ]
         Resource = [aws_ecr_repository.lambda_container_repo.arn]
+      },
+      {
+        Sid    = "AllowInvokeLambda"
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Resource = [aws_lambda_function.pexels_image_scraper.arn]
       }
     ]
   })
