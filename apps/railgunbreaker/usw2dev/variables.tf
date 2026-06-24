@@ -37,3 +37,13 @@ variable "subdomain" {
   type        = string
   default     = "railgunbreaker.stage"
 }
+
+variable "project_name" {
+  description = "The name of the project"
+  type        = string
+  default     = "rb"
+}
+
+variable "pexels_url" {
+  type = string
+}

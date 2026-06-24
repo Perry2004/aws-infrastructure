@@ -72,25 +72,13 @@ resource "aws_iam_policy" "rb_gha" {
         ]
       },
       {
-        Sid    = "AllowECRGetToken"
+        Sid    = "AllowInvokeLambda"
         Effect = "Allow"
         Action = [
-          "ecr:GetAuthorizationToken"
-        ],
-        Resource = ["*"]
-      },
-      # {
-      #   Sid    = "AllowECRPush"
-      #   Effect = "Allow"
-      #   Action = [
-      #     "ecr:BatchCheckLayerAvailability",
-      #     "ecr:CompleteLayerUpload",
-      #     "ecr:InitiateLayerUpload",
-      #     "ecr:PutImage",
-      #     "ecr:UploadLayerPart"
-      #   ]
-      #   Resource = [aws_ecr_repository.lambda_container_repo.arn]
-      # }
+          "lambda:InvokeFunction"
+        ]
+        Resource = [aws_lambda_function.pexels_image_scraper.arn]
+      }
     ]
   })
 
