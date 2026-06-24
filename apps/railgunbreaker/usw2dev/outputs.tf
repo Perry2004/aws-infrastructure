@@ -43,16 +43,6 @@ output "acm_certificate_subject_alternative_names" {
   value       = aws_acm_certificate.rb_website.subject_alternative_names
 }
 
-# output "lambda_ecr_repository_url" {
-#   description = "URL of the ECR repository for the lambda container image"
-#   value       = aws_ecr_repository.lambda_container_repo.repository_url
-# }
-
-# output "lambda_ecr_repository_arn" {
-#   description = "ARN of the ECR repository for the lambda container image"
-#   value       = aws_ecr_repository.lambda_container_repo.arn
-# }
-
 # output "event_bridge_rule_name" {
 #   description = "Name of the EventBridge rule that triggers the Pexels image scraper lambda"
 #   value       = aws_cloudwatch_event_rule.pexels_scraper_periodic.name

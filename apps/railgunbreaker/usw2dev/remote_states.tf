@@ -19,3 +19,14 @@ data "terraform_remote_state" "dns" {
     }
   }
 }
+
+data "terraform_remote_state" "portfolio_website" {
+  backend = "remote"
+
+  config = {
+    organization = "perry-zhu-aws"
+    workspaces = {
+      name = "portfolio-website-usw2dev"
+    }
+  }
+}
