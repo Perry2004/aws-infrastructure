@@ -9,9 +9,17 @@ resource "aws_lambda_function" "pexels_image_scraper" {
 
   architectures = ["x86_64"]
 
+  image_config {
+    command = ["dist/lambda-handler.handler"]
+  }
+
   environment {
     variables = {
-      PEXELS_FEATURED_UPLOADS_URL = var.pexels_url
+      PEXELS_FEATURED_UPLOADS_URL  = var.pexels_url
+      S3_BUCKET_NAME               = aws_s3_bucket.rb_website_bucket.bucket
+      S3_OBJECT_KEY                = "${var.s3_website_prefix}/data/rolling-images.json"
+      CLOUDFRONT_DISTRIBUTION_ID   = aws_cloudfront_distribution.rb_website.id
+      CLOUDFRONT_INVALIDATION_PATH = "/data/rolling-images.json"
     }
   }
 }
