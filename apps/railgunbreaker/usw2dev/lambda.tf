@@ -10,7 +10,9 @@ resource "aws_lambda_function" "pexels_image_scraper" {
   architectures = ["x86_64"]
 
   image_config {
-    command = ["dist/lambda-handler.handler"]
+    entry_point       = ["/usr/local/bin/npx", "aws-lambda-ric"]
+    command           = ["lambda-handler.handler"]
+    working_directory = "/app"
   }
 
   environment {
