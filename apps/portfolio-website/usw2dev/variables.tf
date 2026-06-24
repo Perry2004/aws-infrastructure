@@ -32,3 +32,7 @@ variable "project_name" {
   type        = string
   default     = "pwp"
 }
+
+variable "pexels_url" {
+  type = string
+}
