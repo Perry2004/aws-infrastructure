@@ -14,6 +14,12 @@ resource "aws_lambda_function" "pexels_image_scraper" {
   timeout     = 60
 
   architectures = ["x86_64"]
+
+  environment {
+    variables = {
+      PEXELS_FEATURED_UPLOADS_URL = var.pexels_url
+    }
+  }
 }
 
 # EventBridge rule to trigger lambda every 3 days
@@ -36,4 +42,3 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.pexels_scraper_periodic.arn
 }
-
