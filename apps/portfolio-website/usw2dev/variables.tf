@@ -26,3 +26,9 @@ variable "s3_website_prefix" {
   type        = string
   default     = "website"
 }
+
+variable "project_name" {
+  description = "The name of the project"
+  type        = string
+  default     = "pwp"
+}
