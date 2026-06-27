@@ -1,5 +1,7 @@
 locals {
-  rb_website_domain_name = "${var.subdomain}.${data.terraform_remote_state.dns.outputs.domain_name}"
+  rb_website_domain_name         = "${var.subdomain}.${data.terraform_remote_state.dns.outputs.domain_name}"
+  rb_website_icu_domain_name     = var.custom_domain_name
+  rb_website_icu_www_domain_name = var.custom_www_domain_name
 }
 
 # DNS alias record to route domain to CloudFront distribution
@@ -89,6 +91,21 @@ resource "aws_acm_certificate_validation" "rb_website" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.rb_website.arn
   validation_record_fqdns = [for record in aws_route53_record.rb_website_cert_validation : record.fqdn]
+}
+
+resource "aws_acm_certificate" "rb_website_icu" {
+  provider                  = aws.us-east-1
+  domain_name               = local.rb_website_icu_domain_name
+  subject_alternative_names = [local.rb_website_icu_www_domain_name]
+  validation_method         = "DNS"
+
+  tags = {
+    Name = "rbWebsite-ICU-Certificate-${var.env_name}"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Origin Access Control to allow CloudFront to access private S3 bucket

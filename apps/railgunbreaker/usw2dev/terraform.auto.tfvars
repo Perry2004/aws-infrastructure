@@ -1,3 +1,5 @@
-env_name    = "usw2dev"
-github_repo = "RailgunBreaker/RailgunBreaker.github.io"
-pexels_url  = "https://www.pexels.com/@railgunbreaker/featured-uploads/"
+env_name               = "usw2dev"
+github_repo            = "RailgunBreaker/RailgunBreaker.github.io"
+custom_domain_name     = "railgunbreaker.icu"
+custom_www_domain_name = "www.railgunbreaker.icu"
+pexels_url             = "https://www.pexels.com/@railgunbreaker/featured-uploads/"

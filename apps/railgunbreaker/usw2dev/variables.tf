@@ -38,6 +38,16 @@ variable "subdomain" {
   default     = "railgunbreaker.stage"
 }
 
+variable "custom_domain_name" {
+  description = "The Cloudflare-managed apex domain to prepare for the RailGunBreaker website"
+  type        = string
+}
+
+variable "custom_www_domain_name" {
+  description = "The Cloudflare-managed www domain to prepare for the RailGunBreaker website"
+  type        = string
+}
+
 variable "project_name" {
   description = "The name of the project"
   type        = string
