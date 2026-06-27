@@ -32,12 +32,6 @@ variable "github_repo" {
   type        = string
 }
 
-variable "subdomain" {
-  description = "The subdomain to use for the website"
-  type        = string
-  default     = "railgunbreaker.stage"
-}
-
 variable "custom_domain_name" {
   description = "The Cloudflare-managed apex domain to prepare for the RailGunBreaker website"
   type        = string

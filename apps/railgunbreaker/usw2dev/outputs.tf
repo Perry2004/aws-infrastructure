@@ -30,22 +30,17 @@ output "cloudfront_domain_name" {
 
 output "acm_certificate_arn" {
   description = "ARN of the ACM certificate for the RailGunBreaker custom domain in us-east-1"
-  value       = aws_acm_certificate_validation.rb_website.certificate_arn
+  value       = aws_acm_certificate.rb_website_icu.arn
 }
 
 output "acm_certificate_domain_name" {
   description = "Domain name covered by the RailGunBreaker ACM certificate"
-  value       = aws_acm_certificate.rb_website.domain_name
+  value       = aws_acm_certificate.rb_website_icu.domain_name
 }
 
 output "acm_certificate_subject_alternative_names" {
   description = "Subject alternative names covered by the RailGunBreaker ACM certificate"
-  value       = aws_acm_certificate.rb_website.subject_alternative_names
-}
-
-output "railgunbreaker_icu_acm_certificate_arn" {
-  description = "ARN of the pending ACM certificate for railgunbreaker.icu in us-east-1"
-  value       = aws_acm_certificate.rb_website_icu.arn
+  value       = aws_acm_certificate.rb_website_icu.subject_alternative_names
 }
 
 output "railgunbreaker_icu_acm_certificate_dns_validation_records" {
