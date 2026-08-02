@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# Lightsail prepends its own /bin/sh initialization to user data, so invoke
+# Bash explicitly instead of relying on this template's shebang.
+exec /usr/bin/env bash <<'CLIPROXY_BOOTSTRAP'
 set -euo pipefail
 
 exec > >(tee -a /var/log/cliproxy-bootstrap.log | logger -t cliproxy-bootstrap -s 2>/dev/console) 2>&1
@@ -168,3 +171,4 @@ systemctl enable --now cliproxyapi.service
 caddy validate --config /etc/caddy/Caddyfile
 systemctl enable caddy.service
 systemctl restart caddy.service
+CLIPROXY_BOOTSTRAP
