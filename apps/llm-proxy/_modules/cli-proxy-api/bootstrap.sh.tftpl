@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+exec > >(tee -a /var/log/cliproxy-bootstrap.log | logger -t cliproxy-bootstrap -s 2>/dev/console) 2>&1
+
+export DEBIAN_FRONTEND=noninteractive
+
+if ! swapon --show=NAME --noheadings | grep -qx '/swapfile'; then
+  if [ ! -f /swapfile ]; then
+    fallocate -l 1G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+  fi
+  swapon /swapfile
+fi
+grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+timedatectl set-timezone America/Vancouver
+
+apt-get update
+apt-get install -y --no-install-recommends apt-transport-https ca-certificates curl debian-archive-keyring debian-keyring gnupg openssl
+
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
+  | gpg --dearmor --yes -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
+  > /etc/apt/sources.list.d/caddy-stable.list
+chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg /etc/apt/sources.list.d/caddy-stable.list
+apt-get update
+apt-get install -y --no-install-recommends caddy
+
+if ! id cliproxy >/dev/null 2>&1; then
+  useradd --system --home-dir /var/lib/cliproxyapi --create-home --shell /usr/sbin/nologin cliproxy
+fi
+
+install -d -o root -g root -m 0755 /opt/cliproxyapi
+install -d -o root -g cliproxy -m 0750 /etc/cliproxyapi
+install -d -o cliproxy -g cliproxy -m 0750 /var/lib/cliproxyapi/auth
+
+cat > /usr/local/sbin/update-cliproxyapi <<'UPDATE_SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 VERSION_WITHOUT_LEADING_V" >&2
+  exit 2
+fi
+
+VERSION="$${1#v}"
+case "$(uname -m)" in
+  x86_64) ARCH="amd64" ;;
+  aarch64|arm64) ARCH="aarch64" ;;
+  *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+
+ARCHIVE="CLIProxyAPI_$${VERSION}_linux_$${ARCH}.tar.gz"
+RELEASE_URL="https://github.com/router-for-me/CLIProxyAPI/releases/download/v$${VERSION}"
+WORK_DIR="$(mktemp -d)"
+trap 'rm -rf "$${WORK_DIR}"' EXIT
+
+curl -fsSL "$${RELEASE_URL}/checksums.txt" -o "$${WORK_DIR}/checksums.txt"
+curl -fsSL "$${RELEASE_URL}/$${ARCHIVE}" -o "$${WORK_DIR}/$${ARCHIVE}"
+(
+  cd "$${WORK_DIR}"
+  grep "  $${ARCHIVE}$" checksums.txt | sha256sum --check --strict -
+  tar -xzf "$${ARCHIVE}"
+)
+
+install -o root -g root -m 0755 "$${WORK_DIR}/cli-proxy-api" /opt/cliproxyapi/cli-proxy-api.new
+mv -f /opt/cliproxyapi/cli-proxy-api.new /opt/cliproxyapi/cli-proxy-api
+
+if systemctl is-active --quiet cliproxyapi.service; then
+  systemctl restart cliproxyapi.service
+fi
+UPDATE_SCRIPT
+chmod 0755 /usr/local/sbin/update-cliproxyapi
+# Terraform expands this template expression before the script runs.
+# shellcheck disable=SC2016
+/usr/local/sbin/update-cliproxyapi '${cliproxyapi_version}'
+
+umask 077
+if [ ! -s /var/lib/cliproxyapi/api-key ]; then
+  openssl rand -hex 32 > /var/lib/cliproxyapi/api-key
+fi
+# Terraform converts $${API_KEY} below to a shell expansion in the rendered script.
+# shellcheck disable=SC2034
+API_KEY="$(cat /var/lib/cliproxyapi/api-key)"
+
+cat > /etc/cliproxyapi/config.yaml <<CONFIG
+host: "127.0.0.1"
+port: 8317
+
+tls:
+  enable: false
+  cert: ""
+  key: ""
+
+remote-management:
+  allow-remote: false
+  secret-key: ""
+  disable-control-panel: true
+
+auth-dir: "/var/lib/cliproxyapi/auth"
+
+api-keys:
+  - "$${API_KEY}"
+
+debug: false
+commercial-mode: true
+logging-to-file: false
+usage-statistics-enabled: false
+
+plugins:
+  enabled: false
+  dir: "/var/lib/cliproxyapi/plugins"
+CONFIG
+chown root:cliproxy /etc/cliproxyapi/config.yaml
+chmod 0640 /etc/cliproxyapi/config.yaml
+chown root:root /var/lib/cliproxyapi/api-key
+chmod 0600 /var/lib/cliproxyapi/api-key
+
+cat > /etc/systemd/system/cliproxyapi.service <<'SERVICE'
+[Unit]
+Description=CLIProxyAPI
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=cliproxy
+Group=cliproxy
+WorkingDirectory=/var/lib/cliproxyapi
+ExecStart=/opt/cliproxyapi/cli-proxy-api --config /etc/cliproxyapi/config.yaml
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadWritePaths=/var/lib/cliproxyapi
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+cat > /etc/caddy/Caddyfile <<'CADDYFILE'
+${server_hostname} {
+  reverse_proxy 127.0.0.1:8317
+}
+CADDYFILE
+chown root:caddy /etc/caddy/Caddyfile
+chmod 0640 /etc/caddy/Caddyfile
+
+install -d -m 0755 /etc/systemd/journald.conf.d
+cat > /etc/systemd/journald.conf.d/cliproxyapi.conf <<'JOURNALD'
+[Journal]
+SystemMaxUse=100M
+RuntimeMaxUse=50M
+MaxRetentionSec=7day
+JOURNALD
+
+systemctl daemon-reload
+systemctl restart systemd-journald
+systemctl enable --now cliproxyapi.service
+caddy validate --config /etc/caddy/Caddyfile
+systemctl enable caddy.service
+systemctl restart caddy.service
