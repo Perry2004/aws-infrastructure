@@ -13,6 +13,10 @@ resource "aws_lightsail_instance" "proxy" {
   tags = {
     Name = var.instance_name
   }
+
+  lifecycle {
+    ignore_changes = [user_data]
+  }
 }
 
 resource "aws_lightsail_static_ip" "proxy" {

@@ -36,8 +36,9 @@ if ! id cliproxy >/dev/null 2>&1; then
 fi
 
 install -d -o root -g root -m 0755 /opt/cliproxyapi
-install -d -o root -g cliproxy -m 0750 /etc/cliproxyapi
+install -d -o root -g cliproxy -m 0770 /etc/cliproxyapi
 install -d -o cliproxy -g cliproxy -m 0750 /var/lib/cliproxyapi/auth
+install -d -o cliproxy -g cliproxy -m 0750 /var/lib/cliproxyapi/static
 
 cat > /usr/local/sbin/update-cliproxyapi <<'UPDATE_SCRIPT'
 #!/usr/bin/env bash
@@ -84,9 +85,14 @@ umask 077
 if [ ! -s /var/lib/cliproxyapi/api-key ]; then
   openssl rand -hex 32 > /var/lib/cliproxyapi/api-key
 fi
+if [ ! -s /var/lib/cliproxyapi/management-key ]; then
+  openssl rand -hex 32 > /var/lib/cliproxyapi/management-key
+fi
 # Terraform converts $${API_KEY} below to a shell expansion in the rendered script.
 # shellcheck disable=SC2034
 API_KEY="$(cat /var/lib/cliproxyapi/api-key)"
+# shellcheck disable=SC2034
+MANAGEMENT_KEY="$(cat /var/lib/cliproxyapi/management-key)"
 
 cat > /etc/cliproxyapi/config.yaml <<CONFIG
 host: "127.0.0.1"
@@ -99,8 +105,8 @@ tls:
 
 remote-management:
   allow-remote: false
-  secret-key: ""
-  disable-control-panel: true
+  secret-key: "$${MANAGEMENT_KEY}"
+  disable-control-panel: false
 
 auth-dir: "/var/lib/cliproxyapi/auth"
 
@@ -116,10 +122,12 @@ plugins:
   enabled: false
   dir: "/var/lib/cliproxyapi/plugins"
 CONFIG
-chown root:cliproxy /etc/cliproxyapi/config.yaml
-chmod 0640 /etc/cliproxyapi/config.yaml
+chown cliproxy:cliproxy /etc/cliproxyapi/config.yaml
+chmod 0600 /etc/cliproxyapi/config.yaml
 chown root:root /var/lib/cliproxyapi/api-key
 chmod 0600 /var/lib/cliproxyapi/api-key
+chown root:root /var/lib/cliproxyapi/management-key
+chmod 0600 /var/lib/cliproxyapi/management-key
 
 cat > /etc/systemd/system/cliproxyapi.service <<'SERVICE'
 [Unit]
@@ -132,6 +140,7 @@ Type=simple
 User=cliproxy
 Group=cliproxy
 WorkingDirectory=/var/lib/cliproxyapi
+Environment=MANAGEMENT_STATIC_PATH=/var/lib/cliproxyapi/static
 ExecStart=/opt/cliproxyapi/cli-proxy-api --config /etc/cliproxyapi/config.yaml
 Restart=on-failure
 RestartSec=5s
@@ -142,7 +151,7 @@ ProtectSystem=strict
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
-ReadWritePaths=/var/lib/cliproxyapi
+ReadWritePaths=/var/lib/cliproxyapi /etc/cliproxyapi
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
 
 [Install]
@@ -151,7 +160,13 @@ SERVICE
 
 cat > /etc/caddy/Caddyfile <<'CADDYFILE'
 ${server_hostname} {
-  reverse_proxy 127.0.0.1:8317
+	@public_api path /v1 /v1/* /v1beta /v1beta/*
+	handle @public_api {
+		reverse_proxy 127.0.0.1:8317
+	}
+	handle {
+		respond 404
+	}
 }
 CADDYFILE
 chown root:caddy /etc/caddy/Caddyfile
