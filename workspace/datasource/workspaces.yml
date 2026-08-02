@@ -28,3 +28,8 @@ workspaces:
     working_directory: "apps/railgunbreaker/usw2dev"
     trigger_patterns:
       - "apps/railgunbreaker/_modules/**"
+  - name: "llm-proxy-usw2dev"
+    description: "Workspace for the infrastructure of the LLM Proxy in usw2dev"
+    working_directory: "apps/llm-proxy/usw2dev"
+    trigger_patterns:
+      - "apps/llm-proxy/_modules/**"
