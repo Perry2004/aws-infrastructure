@@ -16,7 +16,7 @@ resource "aws_lightsail_instance" "proxy" {
 }
 
 resource "aws_lightsail_static_ip" "proxy" {
-  name = var.instance_name
+  name = "${var.instance_name}-ipv4"
 }
 
 resource "aws_lightsail_static_ip_attachment" "proxy" {
