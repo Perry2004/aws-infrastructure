@@ -27,3 +27,11 @@ sudo -u cliproxy -H /opt/cliproxyapi/cli-proxy-api --config /etc/cliproxyapi/con
 ```
 
 Replace `--codex-login` with `--claude-login` or `--antigravity-login` when needed. Credentials are written to `/var/lib/cliproxyapi/auth` and detected by the running service.
+
+## Management page
+The management page is enabled only for local port forwarding.
+
+```sh
+ssh llm-proxy-lightsail -N -L 8317:127.0.0.1:8317
+```
+Then access through `http://localhost:8317/management.html#/login`.
