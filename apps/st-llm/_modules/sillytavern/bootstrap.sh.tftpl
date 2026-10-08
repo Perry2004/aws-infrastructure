@@ -1,0 +1,190 @@
+#!/bin/sh
+# Lightsail prepends /bin/sh initialization to user data; explicitly enter Bash.
+exec /usr/bin/env bash <<'SILLYTAVERN_BOOTSTRAP'
+set -euo pipefail
+
+exec > >(tee -a /var/log/sillytavern-bootstrap.log | logger -t sillytavern-bootstrap -s 2>/dev/console) 2>&1
+export DEBIAN_FRONTEND=noninteractive
+
+if ! swapon --show=NAME --noheadings | grep -qx '/swapfile'; then
+  if [ ! -f /swapfile ]; then
+    fallocate -l 1G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+  fi
+  swapon /swapfile
+fi
+grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+timedatectl set-timezone America/Vancouver
+
+apt-get update
+apt-get install -y --no-install-recommends ca-certificates curl debian-archive-keyring debian-keyring git gnupg openssl
+
+install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+  | gpg --dearmor --yes -o /etc/apt/keyrings/nodesource.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_24.x nodistro main' \
+  > /etc/apt/sources.list.d/nodesource.list
+curl -fsSL https://dl.cloudsmith.io/public/caddy/stable/gpg.key \
+  | gpg --dearmor --yes -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -fsSL https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt \
+  > /etc/apt/sources.list.d/caddy-stable.list
+chmod 0644 /etc/apt/keyrings/nodesource.gpg /usr/share/keyrings/caddy-stable-archive-keyring.gpg /etc/apt/sources.list.d/caddy-stable.list
+apt-get update
+apt-get install -y --no-install-recommends nodejs caddy
+
+if ! id sillytavern >/dev/null 2>&1; then
+  useradd --system --home-dir /var/lib/sillytavern --create-home --shell /usr/sbin/nologin sillytavern
+fi
+install -d -o sillytavern -g sillytavern -m 0750 /opt/sillytavern /var/lib/sillytavern /etc/sillytavern
+install -d -o root -g root -m 0700 /var/lib/sillytavern-bootstrap
+
+if [ ! -d /opt/sillytavern/.git ]; then
+  # Terraform expands the release tag before the script runs.
+  # shellcheck disable=SC2016
+  runuser -u sillytavern -- git clone --depth 1 --branch '${sillytavern_version}' \
+    https://github.com/SillyTavern/SillyTavern.git /opt/sillytavern
+fi
+cd /opt/sillytavern
+runuser -u sillytavern -- npm ci --omit=dev --no-audit --no-fund
+install -d -o sillytavern -g sillytavern -m 0750 /opt/sillytavern/public/scripts/extensions/third-party
+
+if [ ! -s /etc/sillytavern/config.yaml ]; then
+  cat > /etc/sillytavern/config.yaml <<'CONFIG'
+dataRoot: /var/lib/sillytavern/data
+# Listen mode enables the authentication middleware, but only bind loopback.
+listen: true
+listenAddress:
+  ipv4: 127.0.0.1
+protocol:
+  ipv4: true
+  ipv6: false
+port: 8000
+browserLaunch:
+  enabled: false
+whitelistMode: true
+whitelist:
+  - 127.0.0.1
+  - ::1
+enableForwardedWhitelist: false
+whitelistDockerHosts: false
+enableUserAccounts: true
+enableDiscreetLogin: true
+basicAuthMode: true
+perUserBasicAuth: true
+hostWhitelist:
+  enabled: true
+  hosts:
+    - ${server_hostname}
+# Caddy overwrites X-Real-IP; only its loopback connection reaches this port.
+forwardedHeaders:
+  xRealIp: true
+  xForwardedFor: false
+  cfConnectingIp: false
+rateLimiting:
+  preferRealIpHeader: true
+  basicAuthMaxAttempts: 5
+enableServerPlugins: false
+extensions:
+  enabled: true
+  autoUpdate: false
+  models:
+    autoDownload: false
+CONFIG
+  chown sillytavern:sillytavern /etc/sillytavern/config.yaml
+  chmod 0600 /etc/sillytavern/config.yaml
+fi
+# recover.js expects this path; the service explicitly uses the /etc config.
+ln -sfn /etc/sillytavern/config.yaml /opt/sillytavern/config.yaml
+
+# Generate credentials on the host, never in Terraform state or cloud-init logs.
+# Keep a marker so rerunning bootstrap does not reset a password changed in the UI.
+if [ ! -f /var/lib/sillytavern-bootstrap/account-initialized ]; then
+  umask 077
+  if [ ! -s /var/lib/sillytavern-bootstrap/initial-password ]; then
+    openssl rand -hex 24 > /var/lib/sillytavern-bootstrap/initial-password
+  fi
+  runuser -u sillytavern -- node --input-type=module -e '
+    import fs from "node:fs";
+    import { setConfigFilePath } from "./src/util.js";
+    setConfigFilePath("/etc/sillytavern/config.yaml");
+    const { recoverPassword } = await import("./src/recover-password.js");
+    await recoverPassword("/etc/sillytavern/config.yaml", "default-user", fs.readFileSync(0, "utf8").trim());
+  ' < /var/lib/sillytavern-bootstrap/initial-password
+  touch /var/lib/sillytavern-bootstrap/account-initialized
+  umask 022
+fi
+
+cat > /etc/systemd/system/sillytavern.service <<'SERVICE'
+[Unit]
+Description=SillyTavern
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=sillytavern
+Group=sillytavern
+WorkingDirectory=/opt/sillytavern
+Environment=NODE_ENV=production
+Environment=HOME=/var/lib/sillytavern
+ExecStart=/usr/bin/node /opt/sillytavern/server.js --configPath /etc/sillytavern/config.yaml
+Restart=on-failure
+RestartSec=5s
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadWritePaths=/var/lib/sillytavern /etc/sillytavern /opt/sillytavern/public/scripts/extensions/third-party
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+cat > /etc/caddy/Caddyfile <<'CADDYFILE'
+${server_hostname} {
+  reverse_proxy 127.0.0.1:8000 {
+    header_up X-Real-IP {remote_host}
+    flush_interval -1
+  }
+}
+CADDYFILE
+chown root:caddy /etc/caddy/Caddyfile
+chmod 0640 /etc/caddy/Caddyfile
+
+install -d -m 0755 /etc/systemd/journald.conf.d
+cat > /etc/systemd/journald.conf.d/sillytavern.conf <<'JOURNALD'
+[Journal]
+SystemMaxUse=100M
+RuntimeMaxUse=50M
+MaxRetentionSec=7day
+JOURNALD
+
+systemctl daemon-reload
+systemctl restart systemd-journald
+systemctl enable --now sillytavern.service
+
+# Do not publish the application until its authentication gate is responding.
+READY=false
+for ((attempt = 0; attempt < 90; attempt++)); do
+  STATUS="$(curl --max-time 5 -s -o /dev/null -w '%%{http_code}' http://127.0.0.1:8000/ || true)"
+  if [ "$STATUS" = 401 ]; then
+    READY=true
+    break
+  fi
+  sleep 2
+done
+if [ "$READY" != true ]; then
+  echo 'SillyTavern did not become ready with authentication enabled.' >&2
+  exit 1
+fi
+caddy validate --config /etc/caddy/Caddyfile
+systemctl enable caddy.service
+systemctl restart caddy.service
+echo 'SillyTavern bootstrap complete. Retrieve the initial password over SSH.'
+SILLYTAVERN_BOOTSTRAP
