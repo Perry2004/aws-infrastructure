@@ -18,11 +18,6 @@ variable "lightsail_bundle" {
   type        = string
 }
 
-variable "admin_ipv4_cidr" {
-  description = "Trusted administrator IPv4 CIDR allowed to connect over SSH"
-  type        = string
-}
-
 variable "cliproxyapi_version" {
   description = "Pinned CLIProxyAPI release version without the leading v"
   type        = string

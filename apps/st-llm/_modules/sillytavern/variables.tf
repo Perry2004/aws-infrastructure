@@ -18,11 +18,6 @@ variable "lightsail_bundle" {
   type        = string
 }
 
-variable "admin_ipv4_cidr" {
-  description = "Trusted administrator IPv4 CIDR allowed to connect over SSH"
-  type        = string
-}
-
 variable "sillytavern_version" {
   description = "Pinned SillyTavern release tag without a leading v"
   type        = string

@@ -35,8 +35,8 @@ resource "aws_lightsail_instance_public_ports" "proxy" {
     protocol   = "tcp"
     from_port  = 22
     to_port    = 22
-    cidrs      = [var.admin_ipv4_cidr]
-    ipv6_cidrs = []
+    cidrs      = ["0.0.0.0/0"]
+    ipv6_cidrs = ["::/0"]
   }
 
   port_info {
