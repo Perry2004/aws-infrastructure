@@ -45,16 +45,6 @@ variable "lightsail_bundle_id" {
   }
 }
 
-variable "admin_ipv4_cidr" {
-  description = "Trusted administrator IPv4 CIDR allowed to connect over SSH"
-  type        = string
-
-  validation {
-    condition     = can(cidrnetmask(var.admin_ipv4_cidr))
-    error_message = "admin_ipv4_cidr must be a valid IPv4 CIDR, for example 203.0.113.10/32."
-  }
-}
-
 variable "cliproxyapi_version" {
   description = "Pinned CLIProxyAPI release version without the leading v"
   type        = string

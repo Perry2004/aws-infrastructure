@@ -44,16 +44,6 @@ variable "lightsail_bundle_id" {
   default = "micro_3_0" // 1 GB RAM
 }
 
-variable "admin_ipv4_cidr" {
-  description = "Trusted administrator IPv4 CIDR allowed to connect over SSH"
-  type        = string
-
-  validation {
-    condition     = can(cidrnetmask(var.admin_ipv4_cidr)) && var.admin_ipv4_cidr != "0.0.0.0/0"
-    error_message = "admin_ipv4_cidr must be a restricted IPv4 CIDR, for example 203.0.113.10/32."
-  }
-}
-
 variable "sillytavern_version" {
   description = "Pinned SillyTavern release tag, without a leading v; used on first boot only"
   type        = string
