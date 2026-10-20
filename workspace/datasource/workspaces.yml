@@ -33,6 +33,11 @@ workspaces:
     working_directory: "apps/llm-proxy/usw2dev"
     trigger_patterns:
       - "apps/llm-proxy/_modules/**"
+  - name: "llm-proxy-research-usw2dev"
+    description: "Workspace for the infrastructure of the LLM Proxy in usw2dev"
+    working_directory: "apps/llm-proxy/research-usw2dev"
+    trigger_patterns:
+      - "apps/llm-proxy/_modules/**"
   - name: "st-llm-usw2dev"
     description: "Workspace for the infrastructure of the SillyTavern LLM frontend in usw2dev"
     working_directory: "apps/st-llm/usw2dev"
