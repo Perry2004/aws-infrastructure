@@ -3,6 +3,12 @@ variable "instance_name" {
   type        = string
 }
 
+variable "key_pair_name" {
+  description = "Lightsail SSH key pair name; null uses the default regional key"
+  type        = string
+  default     = null
+}
+
 variable "availability_zone" {
   description = "Lightsail availability zone"
   type        = string
