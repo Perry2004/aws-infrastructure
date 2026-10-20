@@ -4,6 +4,7 @@ resource "aws_lightsail_instance" "proxy" {
   blueprint_id      = var.lightsail_blueprint
   bundle_id         = var.lightsail_bundle
   ip_address_type   = "dualstack"
+  key_pair_name     = var.key_pair_name
 
   user_data = templatefile("${path.module}/bootstrap.sh.tftpl", {
     cliproxyapi_version = var.cliproxyapi_version
